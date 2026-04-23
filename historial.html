@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Ventas - Pantalla Completa</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --morado-principal: #7c3aed;
+            --morado-oscuro: #6d28d9;
+            --morado-claro: #f5f3ff;
+        }
+
+        /* Eliminar márgenes laterales del body para maximizar espacio */
+        body {
+            overflow-x: hidden;
+        }
+
+        .bg-purple { background-color: var(--morado-principal) !important; }
+        
+        .btn-purple { 
+            background-color: var(--morado-principal) !important; 
+            color: white !important;
+            border: none;
+        }
+        .btn-purple:hover { 
+            background-color: var(--morado-oscuro) !important; 
+        }
+
+        .text-purple { color: var(--morado-principal) !important; }
+
+        /* Tabla que ocupa todo el ancho */
+        .thead-purple {
+            background-color: var(--morado-principal) !important;
+            color: white !important;
+        }
+
+        /* Ajuste para que la tabla se vea bien en pantallas gigantes */
+        .table {
+            width: 100% !important;
+            margin-bottom: 0;
+        }
+
+        /* Modal con estilo morado */
+        .modal-header {
+            background-color: var(--morado-principal);
+            color: white;
+        }
+        .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+
+        /* Estilo para los botones del NAV en ancho completo */
+        .navbar {
+            padding: 0.5rem 2rem;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-purple shadow-sm">
+    <div class="container-fluid">
+        <span class="navbar-brand fw-bold">SISTEMA</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav ms-auto gap-2">
+                <a href="busqueda.html" class="btn btn-outline-light btn-sm">Buscar</a>
+                <a href="inventario.html" class="btn btn-outline-light btn-sm">Inventario</a>
+                <a href="ventas.html" class="btn btn-outline-light btn-sm">Ventas</a>
+                <a href="clasificaciones.html" class="btn btn-outline-light btn-sm">Clasificaciones</a>
+                <a href="ingresos.html" class="btn btn-outline-light btn-sm">Ingresos</a>
+                <a href="historial.html" class="btn btn-light btn-sm text-purple fw-bold">Historial</a>
+                <button onclick="cerrarSesion()" class="btn btn-danger btn-sm ms-lg-3">Salir</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid mt-3 px-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-purple fw-bold mb-0">Historial de Ventas</h2>
+        <div class="text-muted">Mostrando todos los registros del sistema</div>
+    </div>
+
+    <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover text-center align-middle">
+                <thead class="thead-purple">
+                    <tr>
+                        <th class="py-3" style="width: 40%;">Fecha y Hora de Transacción</th>
+                        <th class="py-3" style="width: 30%;">Total (Q)</th>
+                        <th class="py-3" style="width: 30%;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaHistorial" class="bg-white">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg"> <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Detalle de la Venta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <ul id="detalleLista" class="list-group list-group-flush">
+                    </ul>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/auth-session.js"></script>
+<script src="js/historial.js"></script>
+
+</body>
+</html>
