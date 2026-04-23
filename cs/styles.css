@@ -1,0 +1,157 @@
+/* 1. CONFIGURACIÓN GENERAL Y VARIABLES */
+:root {
+    --purple-primary: #7c3aed;    /* Púrpura principal */
+    --purple-hover: #6d28d9;      /* Púrpura oscuro para botones */
+    --purple-light: #f5f3ff;      /* Fondo muy claro */
+    --text-dark: #1f2937;
+    --white: #ffffff;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--purple-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* 2. NAVEGACIÓN RESPONSIVA */
+nav {
+    background-color: var(--purple-primary);
+    padding: 1rem;
+    color: white;
+    box-shadow: var(--shadow);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Permite que los elementos bajen en pantallas pequeñas */
+    gap: 1rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.3s;
+}
+
+.nav-links a:hover {
+    opacity: 0.8;
+}
+
+/* 3. CONTENEDOR PRINCIPAL Y TARJETAS */
+.main-container {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 450px; /* Ancho máximo en PC */
+}
+
+.card h2 {
+    color: var(--purple-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* 4. FORMULARIOS */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    outline: none;
+    transition: border-color 0.3s, ring 0.3s;
+}
+
+input:focus {
+    border-color: var(--purple-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+button {
+    width: 100%;
+    background-color: var(--purple-primary);
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 1rem;
+}
+
+button:hover {
+    background-color: var(--purple-hover);
+}
+
+/* 5. MEDIA QUERIES (EL CORAZÓN DE LO RESPONSIVO) */
+
+/* Para tablets y móviles medianos */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column; /* Título arriba, links abajo */
+        text-align: center;
+    }
+    
+    .nav-links {
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Para móviles pequeños */
+@media (max-width: 480px) {
+    .card {
+        padding: 1.5rem;
+    }
+    
+    .nav-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Los links se ponen en dos columnas */
+        width: 100%;
+    }
+
+    .nav-links a {
+        background: rgba(255,255,255,0.1);
+        padding: 8px;
+        border-radius: 4px;
+    }
+}
