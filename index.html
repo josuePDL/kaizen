@@ -2,89 +2,108 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Sistema Púrpura</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="cs/styles.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema Inventario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Estilos específicos para el color morado en esta página */
-        body {
-            background-color: #f5f3ff; /* Un lila muy tenue de fondo */
-            height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.1);
-        }
-        .text-purple { color: #7c3aed !important; }
-        .btn-purple { 
-            background-color: #7c3aed !important; 
-            color: white !important;
-            border: none;
-            padding: 12px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        .btn-purple:hover { 
-            background-color: #6d28d9 !important; 
-            transform: translateY(-2px);
-        }
-        .form-control:focus {
-            border-color: #7c3aed;
-            box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
-        }
+        :root { --bs-success: #7c3aed; }
+        .bg-success { background: #7c3aed !important; }
+        .btn-success { background: #7c3aed !important; border-color: #7c3aed !important; }
+        .table-success { background: #ede9fe !important; }
+        body { background: #f8f9fa; }
+        .card-hover { color: #333; transition: .2s; border: none; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(124, 58, 237, 0.1) !important; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-11 col-sm-8 col-md-6 col-lg-4">
-            
-            <div class="card p-4 p-md-5">
-                <div class="text-center mb-4">
-                    <div class="d-inline-block bg-light p-3 rounded-circle mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#7c3aed" class="bi bi-person-lock" viewBox="0 0 16 16">
-                            <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 5.996V14H1s0-1 2.216-2.635C4.41 10.53 6.13 10 8 10c.926 0 1.798.121 2.541.34m.387-1.04c.125.04.248.084.37.13-.122-.046-.245-.09-.37-.13ZM9 13a1 1 0 0 1 1-1v-1a2 2 0 1 1 4 0v1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2Zm3-3a1 1 0 0 0-1 1v1h2v-1a1 1 0 0 0-1-1Z"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-purple fw-bold">Bienvenido</h2>
-                    <p class="text-muted">Ingresa tus credenciales</p>
+<nav class="navbar navbar-dark bg-success shadow-sm">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">📦 Sistema Inventario</span>
+        <button onclick="cerrarSesion()" class="btn btn-outline-light btn-sm">
+            Cerrar Sesión
+        </button>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a href="inventario.html" class="text-decoration-none">
+                <div class="card shadow card-hover p-4 text-center">
+                    <h4>📦 Inventario</h4>
                 </div>
+            </a>
+        </div>
 
-                <form id="loginForm">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Correo Electrónico</label>
-                        <input type="email" id="email" class="form-control" placeholder="nombre@correo.com" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Contraseña</label>
-                        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
-                    </div>
-                    
-                    <button type="submit" id="btnSubmit" class="btn btn-purple w-100 mt-3 shadow-sm">
-                        Entrar al Sistema
-                    </button>
-                </form>
+        <div class="col-md-4">
+            <a href="ingresos.html" class="text-decoration-none">
+                <div class="card shadow card-hover p-4 text-center">
+                    <h4>📥 Ingresos</h4>
+                </div>
+            </a>
+        </div>
 
-                <div id="mensaje" class="mt-4 alert alert-danger d-none py-2 small text-center"></div>
-            </div>
+        <div class="col-md-4">
+            <a href="ventas.html" class="text-decoration-none">
+                <div class="card shadow card-hover p-4 text-center">
+                    <h4>🧾 Ventas</h4>
+                </div>
+            </a>
+        </div>
 
-            <p class="text-center mt-4 text-muted small">
-                &copy; 2026 Mi Sistema de Inventario
-            </p>
+        <div class="col-md-4">
+            <a href="clasificaciones.html" class="text-decoration-none">
+                <div class="card shadow card-hover p-4 text-center">
+                    <h4>🏷 Clasificaciones</h4>
+                </div>
+            </a>
+        </div>
 
+        <div class="col-md-4">
+            <a href="historial.html" class="text-decoration-none">
+                <div class="card shadow card-hover p-4 text-center">
+                    <h4>📊 Historial</h4>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="busqueda.html" class="text-decoration-none">
+                <div class="card shadow card-hover p-4 text-center">
+                    <h4>🔍 Buscar</h4>
+                </div>
+            </a>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/login.js"></script>
+<script>
+    // Configuración mínima para que funcione el botón en el index
+    const SUPABASE_URL = "https://dbherfalxtdpuekdquso.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiaGVyZmFseHRkcHVla2RxdXNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODY5NTgsImV4cCI6MjA5MzA2Mjk1OH0.ERCeSP2s_0LfPGL5FYy-dKbMIlyRt8Gvg8aZ47DgITA";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Función para cerrar sesión
+    async function cerrarSesion() {
+        const { error } = await client.auth.signOut();
+        if (error) {
+            alert("Error al cerrar sesión");
+        } else {
+            window.location.href = "login.html";
+        }
+    }
+
+    // Seguridad: Si no hay sesión, mandarlo al login de inmediato
+    async function verificarSesion() {
+        const { data: { session } } = await client.auth.getSession();
+        if (!session) {
+            window.location.href = "login.html";
+        }
+    }
+    verificarSesion();
+</script>
 
 </body>
 </html>

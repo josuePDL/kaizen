@@ -1,149 +1,67 @@
+<!-- ========================= -->
+<!-- inventario.html -->
+<!-- ========================= -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema - Inventario</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        :root {
-            --purple-primary: #7c3aed;
-            --purple-hover: #6d28d9;
-        }
-
-        .bg-purple { background-color: var(--purple-primary) !important; }
-
-        .btn-purple { 
-            background-color: var(--purple-primary) !important; 
-            color: white !important;
-            border: none;
-        }
-
-        .btn-purple:hover { 
-            background-color: var(--purple-hover) !important; 
-        }
-
-        .text-purple { color: var(--purple-primary) !important; }
-
-        .table thead {
-            background-color: var(--purple-primary);
-            color: white;
-        }
-
-        .stock-bajo {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Inventario</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+.bg-success{background:#7c3aed!important;}
+.btn-success{background:#7c3aed!important;border-color:#7c3aed!important;}
+</style>
 </head>
-
-<body class="bg-light">
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-purple shadow-sm">
-    <div class="container-fluid">
-        <span class="navbar-brand fw-bold">Sistema</span>
-        
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="busqueda.html" class="btn btn-outline-light btn-sm">Buscar</a>
-            <a href="inventario.html" class="btn btn-light btn-sm text-purple fw-bold">Inventario</a>
-            <a href="ventas.html" class="btn btn-outline-light btn-sm">Ventas</a>
-            <a href="clasificaciones.html" class="btn btn-outline-light btn-sm">Clasificaciones</a>
-            <a href="historial.html" class="btn btn-outline-light btn-sm">Historial</a>
-            <a href="ingresos.html" class="btn btn-outline-light btn-sm">Ingreso productos</a>
-            <button onclick="cerrarSesion()" class="btn btn-danger btn-sm">Salir</button>
-        </div>
-    </div>
+<body>
+<nav class="navbar navbar-dark bg-success">
+<div class="container-fluid">
+<span class="navbar-brand">Inventario</span>
+<a href="index.html" class="btn btn-light btn-sm">Inicio</a>
+</div>
 </nav>
 
-<!-- CONTENIDO -->
-<div class="container-fluid mt-4 px-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-purple fw-bold m-0">Inventario de Productos</h3>
-        <span class="badge bg-purple p-2">Inventario Real</span>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-
-            <div class="card shadow-sm border-0 w-100">
-                <div class="table-responsive">
-
-                    <table class="table table-hover align-middle text-center mb-0 w-100">
-
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Nombre</th>
-                                <th>Categoría</th>
-                                <th>Costo</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="tablaProductos">
-                            <!-- JS llena esto -->
-                        </tbody>
-
-                    </table>
-
-                </div>
-            </div>
-
-        </div>
-    </div>
-
+<div class="container mt-4">
+    <input id="buscar" class="form-control mb-3" placeholder="Buscar producto...">
+    <table class="table table-bordered text-center">
+        <thead class="table-success text-white" style="background-color: #7c3aed;">
+            <tr>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tablaProductos"></tbody>
+    </table>
 </div>
 
-<!-- MODAL EDITAR -->
-<div class="modal fade" id="modalEditar" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            
-            <div class="modal-header bg-purple text-white">
-                <h5 class="modal-title">Editar Producto</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body p-4">
-                <input type="hidden" id="editId">
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Nombre</label>
-                    <input id="editNombre" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Precio</label>
-                    <input id="editPrecio" type="number" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Stock</label>
-                    <input id="editStock" type="number" class="form-control">
-                </div>
-            </div>
-
-            <div class="modal-footer border-0">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-purple" onclick="guardarCambios()">Guardar</button>
-            </div>
-
-        </div>
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label>Nombre:</label>
+        <input type="text" id="editNombre" class="form-control mb-2">
+        <label>Precio Venta:</label>
+        <input type="number" id="editPrecio" class="form-control mb-2">
+        <label>Stock:</label>
+        <input type="number" id="editStock" class="form-control mb-2">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-success" onclick="guardarCambios()">Guardar Cambios</button>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- SCRIPTS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/inventario.js"></script>
-<script src="js/auth-session.js"></script>
 
 </body>
 </html>

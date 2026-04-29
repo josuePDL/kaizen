@@ -1,127 +1,61 @@
+<!-- ========================= -->
+<!-- ventas.html -->
+<!-- ========================= -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ventas - Sistema Morado</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <style>
-        /* Paleta de colores Morada */
-        :root {
-            --morado-principal: #7c3aed;
-            --morado-oscuro: #6d28d9;
-            --morado-claro: #ede9fe;
-        }
-
-        .bg-purple { background-color: var(--morado-principal) !important; }
-        
-        .btn-purple { 
-            background-color: var(--morado-principal) !important; 
-            color: white !important;
-            border: none;
-        }
-        .btn-purple:hover { 
-            background-color: var(--morado-oscuro) !important; 
-        }
-
-        .text-purple { color: var(--morado-principal) !important; }
-
-        /* Estilo para la tabla */
-        .table-purple {
-            background-color: var(--morado-principal) !important;
-            color: white !important;
-        }
-
-        /* Bordes de inputs al enfocar */
-        .form-control:focus {
-            border-color: var(--morado-principal);
-            box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
-        }
-
-        .card {
-            border-left: 5px solid var(--morado-principal);
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Ventas</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+.bg-success{background:#7c3aed!important;}
+.btn-success{background:#7c3aed!important;border-color:#7c3aed!important;}
+</style>
 </head>
+<body>
 
-<body class="bg-light">
-
-<nav class="navbar navbar-dark bg-purple shadow-sm">
-    <div class="container-fluid">
-        <span class="navbar-brand font-weight-bold">Sistema</span>
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="busqueda.html" class="btn btn-outline-light btn-sm active">Buscar</a>
-            <a href="inventario.html" class="btn btn-outline-light btn-sm">Inventario</a>
-            <a href="ventas.html" class="btn btn-outline-light btn-sm">Ventas</a>
-            <a href="clasificaciones.html" class="btn btn-outline-light btn-sm">Clasificaciones</a>
-            <a href="historial.html" class="btn btn-outline-light btn-sm">Historial</a>
-                        <a href="ingresos.html" class="btn btn-outline-light btn-sm">Ingreso productos</a>
-
-            <button onclick="cerrarSesion()" class="btn btn-danger btn-sm">Salir</button>
-        </div>
-    </div>
+<nav class="navbar navbar-dark bg-success">
+<div class="container-fluid">
+<span class="navbar-brand">Ventas</span>
+<a href="index.html" class="btn btn-light btn-sm">Inicio</a>
+</div>
 </nav>
 
 <div class="container mt-4">
 
-    <h2 class="text-purple mb-4">Nueva Venta</h2>
+<div class="card p-3 mb-3">
+<input id="nit" class="form-control mb-2" placeholder="NIT">
+<input id="cliente" class="form-control" placeholder="Nombre Cliente">
+</div>
 
-    <div class="card p-3 mb-3 shadow-sm">
-        <h6 class="text-muted">Datos del Cliente</h6>
-        <input id="nit" class="form-control mb-2" placeholder="NIT">
-        <input id="cliente" class="form-control" placeholder="Nombre del cliente">
-    </div>
+<div class="card p-3 mb-3">
+<input id="codigo" class="form-control mb-2" placeholder="Código Producto">
+<input id="cantidad" type="number" class="form-control mb-2" placeholder="Cantidad">
+<button onclick="agregarProducto()" class="btn btn-success">Agregar</button>
+</div>
 
-    <div class="card p-3 mb-3 shadow-sm">
-        <h6 class="text-muted">Añadir Productos</h6>
-        <div class="row g-2">
-            <div class="col-8">
-                <input id="codigo" class="form-control" placeholder="Código producto">
-            </div>
-            <div class="col-4">
-                <input id="cantidad" type="number" class="form-control" placeholder="Cant.">
-            </div>
-        </div>
-        <button onclick="agregarProducto()" class="btn btn-purple w-100 mt-2">
-            + Agregar al carrito
-        </button>
-    </div>
+<table class="table table-bordered text-center">
+<thead class="table-success">
+<tr>
+<th>Producto</th>
+<th>Precio</th>
+<th>Cantidad</th>
+<th>Subtotal</th>
+</tr>
+</thead>
+<tbody id="tablaVenta"></tbody>
+</table>
 
-    <div class="table-responsive">
-        <table class="table table-hover text-center">
-            <thead class="table-purple">
-                <tr>
-                    <th>Producto</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody id="tablaVenta" class="bg-white">
-                </tbody>
-        </table>
-    </div>
+<h4>Total: Q<span id="total">0</span></h4>
 
-    <div class="d-flex justify-content-end mt-3">
-        <div class="p-3 bg-purple text-white rounded shadow-sm">
-            <h4 class="mb-0">Total: Q<span id="total">0.00</span></h4>
-        </div>
-    </div>
-
-    <button onclick="finalizarVenta()" class="btn btn-purple btn-lg w-100 mt-4 mb-5 shadow">
-        Finalizar Venta y Generar Comprobante
-    </button>
+<button onclick="finalizarVenta()" class="btn btn-success w-100">
+Finalizar Venta
+</button>
 
 </div>
 
-<script src="js/auth-session.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/ventas.js"></script>
-
 </body>
 </html>

@@ -1,38 +1,48 @@
-// 🔑 CONFIGURACIÓN
-const SUPABASE_URL = "https://tqmetigngakqoftnemjp.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxbWV0aWduZ2FrcW9mdG5lbWpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MjIyMzQsImV4cCI6MjA5MjM5ODIzNH0.AeCiP7zDILSTWqvm3qXSCFF3H6HmPOoVv_5j1kjOwU0";
+const SUPABASE_URL = "https://dbherfalxtdpuekdquso.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiaGVyZmFseHRkcHVla2RxdXNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODY5NTgsImV4cCI6MjA5MzA2Mjk1OH0.ERCeSP2s_0LfPGL5FYy-dKbMIlyRt8Gvg8aZ47DgITA";
 
-// ✅ CREAR CLIENTE CORRECTAMENTE
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+const { createClient } = supabase;
+const client = createClient(SUPABASE_URL, SUPABASE_KEY);
 // 🔍 FUNCIÓN
+// 🔐 FUNCIÓN DE PROTECCIÓN
+async function verificarSesion() {
+    const { data: { session }, error } = await client.auth.getSession();
+
+    if (error || !session) {
+        console.log("Acceso denegado. Redirigiendo al login...");
+        // Cambia 'login.html' por el nombre de tu archivo de inicio de sesión
+        window.location.href = "login.html"; 
+    } else {
+        console.log("Usuario verificado:", session.user.email);
+        // Si el usuario está verificado, procedemos a cargar los datos
+        if (typeof cargarProductos === "function") cargarProductos();
+        if (typeof cargarClasificaciones === "function") cargarClasificaciones();
+    }
+}
+
+// Ejecutar la verificación inmediatamente al cargar la página
+verificarSesion();
+
 async function buscarProducto() {
-    const codigo = document.getElementById("codigo").value.trim();
+    const codigo = document.getElementById("codigo").value;
     const resultado = document.getElementById("resultado");
 
-    if (!codigo) {
-        resultado.innerHTML = `<div class="alert alert-warning">Ingrese un código</div>`;
-        return;
-    }
-
-    resultado.innerHTML = `<div class="text-muted">Buscando...</div>`;
-
-    const { data, error } = await client
+    const { data } = await client
         .from("productos")
         .select("*")
         .eq("codigo", codigo)
         .single();
 
-    if (error || !data) {
-        resultado.innerHTML = `<div class="alert alert-danger">Producto no encontrado</div>`;
+    if (!data) {
+        resultado.innerHTML = "No encontrado";
         return;
     }
 
     resultado.innerHTML = `
-        <div class="card p-3 mt-2">
-            <h5>${data.nombre}</h5>
-            <p class="mb-1"><strong>Precio:</strong> Q${data.precio}</p>
-            <p><strong>Stock:</strong> ${data.stock}</p>
+        <div class="card p-3">
+        <h5>${data.nombre}</h5>
+        <p>Precio: Q${data.precio_venta}</p>
+        <p>Stock: ${data.stock}</p>
         </div>
     `;
 }
