@@ -12,32 +12,72 @@
         .btn-purple:hover { background-color: #6d28d9 !important; color: white; }
         .table-header { background-color: var(--primary-color); color: white; }
         .stock-alerta { background-color: #fee2e2 !important; color: #dc2626; font-weight: bold; }
+
+        /* --- MAGIA PARA TABLAS RESPONSIVAS --- */
+        @media (max-width: 768px) {
+            /* Ocultar el encabezado de la tabla en móvil */
+            .table-header { display: none; }
+            
+            .table, .table tbody, .table tr, .table td { 
+                display: block; 
+                width: 100%; 
+            }
+
+            .table tr {
+                margin-bottom: 15px;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 10px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+
+            .table td {
+                text-align: right !important;
+                padding-left: 50%;
+                position: relative;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+
+            /* Insertamos el nombre de la columna antes del dato */
+            .table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                font-weight: bold;
+                text-align: left;
+                color: var(--primary-color);
+            }
+
+            .table td:last-child { border-bottom: 0; }
+        }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark bg-purple">
-    <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Inventario Real-Time</span>
-        <a href="index.html" class="btn btn-light btn-sm">Volver al Inicio</a>
+<nav class="navbar navbar-dark bg-purple px-2">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <span class="navbar-brand mb-0 h1 fs-5">Inventario Real-Time</span>
+        <a href="index.html" class="btn btn-light btn-sm">Volver</a>
     </div>
 </nav>
 
 <div class="container mt-4">
     <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <label class="form-label fw-bold">Buscar producto:</label>
-            <input id="buscar" class="form-control" placeholder="Escribe el nombre o código (ej: DC001)...">
+        <div class="col-12 col-md-6">
+            <label class="form-label fw-bold small">Buscar producto:</label>
+            <input id="buscar" class="form-control" placeholder="Nombre o código...">
         </div>
-        <div class="col-md-6">
-            <label class="form-label fw-bold">Filtrar por Categoría:</label>
+        <div class="col-12 col-md-6">
+            <label class="form-label fw-bold small">Filtrar por Categoría:</label>
             <select id="filtroClasificacion" class="form-select">
                 <option value="todos">Todas las categorías</option>
-                </select>
+            </select>
         </div>
     </div>
 
-    <div class="table-responsive shadow-sm rounded">
+    <div class="table-responsive-md shadow-sm rounded">
         <table class="table table-hover align-middle text-center">
             <thead class="table-header">
                 <tr>
@@ -49,14 +89,22 @@
                 </tr>
             </thead>
             <tbody id="tablaProductos">
-                </tbody>
+                <tr>
+                    <td data-label="Código">DC001</td>
+                    <td data-label="Producto">Laptop Pro - Electrónica</td>
+                    <td data-label="Precio">Q 5,500.00</td>
+                    <td data-label="Stock" class="stock-alerta">5</td>
+                    <td data-label="Acciones">
+                        <button class="btn btn-sm btn-purple">Editar</button>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>
 
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered"> <div class="modal-content">
             <div class="modal-header bg-purple text-white">
                 <h5 class="modal-title">Actualizar Producto</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -67,21 +115,19 @@
                         <label class="form-label">Nombre del Producto</label>
                         <input type="text" id="editNombre" class="form-control" required>
                     </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Precio Venta (Q)</label>
+                    <div class="row g-2"> <div class="col-6 mb-3">
+                            <label class="form-label">Precio (Q)</label>
                             <input type="number" step="0.01" id="editPrecio" class="form-control" required>
                         </div>
                         <div class="col-6 mb-3">
-                            <label class="form-label">Stock Actual</label>
+                            <label class="form-label">Stock</label>
                             <input type="number" id="editStock" class="form-control" required>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-purple" onclick="guardarCambios()">Guardar Cambios</button>
+            <div class="modal-footer flex-column flex-sm-row"> <button type="button" class="btn btn-secondary w-100 w-sm-auto mb-2 mb-sm-0" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-purple w-100 w-sm-auto" onclick="guardarCambios()">Guardar</button>
             </div>
         </div>
     </div>
