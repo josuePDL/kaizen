@@ -1,62 +1,90 @@
-<!-- ========================= -->
-<!-- inventario.html -->
-<!-- ========================= -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Inventario</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-.bg-success{background:#7c3aed!important;}
-.btn-success{background:#7c3aed!important;border-color:#7c3aed!important;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inventario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --primary-color: #7c3aed; }
+        .bg-purple { background-color: var(--primary-color) !important; }
+        .btn-purple { background-color: var(--primary-color) !important; border-color: var(--primary-color) !important; color: white; }
+        .btn-purple:hover { background-color: #6d28d9 !important; color: white; }
+        .table-header { background-color: var(--primary-color); color: white; }
+        .stock-alerta { background-color: #fee2e2 !important; color: #dc2626; font-weight: bold; }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-dark bg-success">
-<div class="container-fluid">
-<span class="navbar-brand">Inventario</span>
-<a href="index.html" class="btn btn-light btn-sm">Inicio</a>
-</div>
+
+<nav class="navbar navbar-dark bg-purple">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Inventario Real-Time</span>
+        <a href="index.html" class="btn btn-light btn-sm">Volver al Inicio</a>
+    </div>
 </nav>
 
 <div class="container mt-4">
-    <input id="buscar" class="form-control mb-3" placeholder="Buscar producto...">
-    <table class="table table-bordered text-center">
-        <thead class="table-success text-white" style="background-color: #7c3aed;">
-            <tr>
-                <th>Código</th>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="tablaProductos"></tbody>
-    </table>
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Buscar producto:</label>
+            <input id="buscar" class="form-control" placeholder="Escribe el nombre o código (ej: DC001)...">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Filtrar por Categoría:</label>
+            <select id="filtroClasificacion" class="form-select">
+                <option value="todos">Todas las categorías</option>
+                </select>
+        </div>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle text-center">
+            <thead class="table-header">
+                <tr>
+                    <th>Código</th>
+                    <th>Producto / Categoría</th>
+                    <th>Precio Venta</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tablaProductos">
+                </tbody>
+        </table>
+    </div>
 </div>
 
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Editar Producto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <label>Nombre:</label>
-        <input type="text" id="editNombre" class="form-control mb-2">
-        <label>Precio Venta:</label>
-        <input type="number" id="editPrecio" class="form-control mb-2">
-        <label>Stock:</label>
-        <input type="number" id="editStock" class="form-control mb-2">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-success" onclick="guardarCambios()">Guardar Cambios</button>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title">Actualizar Producto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditar">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Producto</label>
+                        <input type="text" id="editNombre" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Precio Venta (Q)</label>
+                            <input type="number" step="0.01" id="editPrecio" class="form-control" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Stock Actual</label>
+                            <input type="number" id="editStock" class="form-control" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-purple" onclick="guardarCambios()">Guardar Cambios</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
