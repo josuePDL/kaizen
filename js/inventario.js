@@ -1,7 +1,6 @@
-// 🔑 CONFIGURACIÓN SUPABASE
+// 1. Configuración de conexión
 const SUPABASE_URL = "https://dbherfalxtdpuekdquso.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiaGVyZmFseHRkcHVla2RxdXNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODY5NTgsImV4cCI6MjA5MzA2Mjk1OH0.ERCeSP2s_0LfPGL5FYy-dKbMIlyRt8Gvg8aZ47DgITA";
-
 
 const { createClient } = supabase;
 const client = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -42,7 +41,7 @@ async function cargarProductos() {
 }
 
 function aplicarFiltros() {
-    const busqueda = document.getElementById("buscar").value.toLowerCase();
+    const busqueda = document.getElementById("buscar").value.toLowerCase().trim();
     const categoriaId = document.getElementById("filtroClasificacion").value;
 
     const filtrados = todosLosProductos.filter(p => {
@@ -66,19 +65,20 @@ function renderizarTabla(lista) {
         const stockClase = p.stock <= (p.stock_minimo || 5) ? 'stock-alerta' : '';
         const productoJSON = JSON.stringify(p).replace(/"/g, '&quot;');
 
-        // Uso de 'p.costo' según tu indicación
-        acumuladoCosto += (parseFloat(p.costo || 0) * parseInt(p.stock || 0));
+        // CALCULOS usando 'precio_compra'
+        acumuladoCosto += (parseFloat(p.precio_compra || 0) * parseInt(p.stock || 0));
         acumuladoVenta += (parseFloat(p.precio_venta || 0) * parseInt(p.stock || 0));
 
         tabla.innerHTML += `
         <tr>
             <td data-label="Código"><code>${p.codigo.toUpperCase()}</code></td>
             <td data-label="Producto">${p.nombre}</td>
-            <td data-label="Costo Unit.">Q${parseFloat(p.costo || 0).toFixed(2)}</td>
+            <td data-label="Costo Unit.">Q${parseFloat(p.precio_compra || 0).toFixed(2)}</td>
             <td data-label="Precio Venta">Q${parseFloat(p.precio_venta || 0).toFixed(2)}</td>
             <td data-label="Stock" class="${stockClase}">${p.stock}</td>
-            <td>
-                <button class="btn btn-purple btn-sm" onclick="abrirModalEditar(${productoJSON})">Editar</button>
+            <td data-label="Acciones">
+                <button class="btn btn-purple btn-sm" onclick='abrirModalEditar(${productoJSON})'>Editar</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="eliminarProducto('${p.id}')">Borrar</button>
             </td>
         </tr>`;
     });
@@ -90,26 +90,37 @@ function renderizarTabla(lista) {
 function abrirModalEditar(producto) {
     idEditando = producto.id;
     document.getElementById("editNombre").value = producto.nombre;
-    document.getElementById("editCosto").value = producto.costo;
+    document.getElementById("editCosto").value = producto.precio_compra; // Se llena con precio_compra
     document.getElementById("editPrecio").value = producto.precio_venta;
     document.getElementById("editStock").value = producto.stock;
     new bootstrap.Modal(document.getElementById('modalEditar')).show();
 }
 
 async function guardarCambios() {
+    if (!idEditando) return;
+
     const updateData = {
         nombre: document.getElementById("editNombre").value,
-        costo: parseFloat(document.getElementById("editCosto").value),
+        precio_compra: parseFloat(document.getElementById("editCosto").value), // Nombre correcto de columna
         precio_venta: parseFloat(document.getElementById("editPrecio").value),
         stock: parseInt(document.getElementById("editStock").value)
     };
 
     const { error } = await client.from("productos").update(updateData).eq("id", idEditando);
-    if (!error) {
-        location.reload(); // Recarga para actualizar lista y totales
+
+    if (error) {
+        alert("❌ Error: " + error.message);
     } else {
-        alert("Error al actualizar");
+        alert("✅ Producto actualizado");
+        bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide();
+        await cargarProductos();
     }
+}
+
+async function eliminarProducto(id) {
+    if (!confirm("¿Eliminar este producto?")) return;
+    const { error } = await client.from("productos").delete().eq("id", id);
+    if (!error) await cargarProductos();
 }
 
 verificarSesion();
