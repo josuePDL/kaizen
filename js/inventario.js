@@ -5,7 +5,10 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const client = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Al cargar la página
+let todosLosProductos = [];
+let idEditando = null;
+
+// Inicialización
 document.addEventListener("DOMContentLoaded", () => {
     verificarSesion();
 });
@@ -15,78 +18,136 @@ async function verificarSesion() {
     if (!session) {
         window.location.href = "login.html";
     } else {
-        cargarClasificaciones();
+        inicializarApp();
     }
 }
 
-// Carga las categorías en el select
-async function cargarClasificaciones() {
-    const select = document.getElementById("clasificacion");
-    try {
-        const { data, error } = await client.from("clasificaciones").select("*").order("nombre");
-        if (error) throw error;
-
-        data.forEach(cat => {
-            const option = document.createElement("option");
-            option.value = cat.id;
-            option.textContent = cat.nombre;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error("Error cargando categorías:", error.message);
-    }
-}
-
-// Función principal para guardar
-async function guardarIngreso() {
-    const btn = document.getElementById("btnGuardar");
+async function inicializarApp() {
+    await cargarClasificaciones();
+    await cargarProductos();
     
-    // Captura de datos
-    const codigo = document.getElementById("codigo").value.trim();
-    const nombre = document.getElementById("nombre").value.trim();
-    const clasificacion_id = document.getElementById("clasificacion").value;
-    const stock = parseInt(document.getElementById("cantidad").value);
-    const precio_compra = parseFloat(document.getElementById("costo").value) || 0;
-    const precio_venta = parseFloat(document.getElementById("precio").value) || 0;
+    // Listeners para filtros
+    document.getElementById("buscar").addEventListener("input", aplicarFiltros);
+    document.getElementById("filtroClasificacion").addEventListener("change", aplicarFiltros);
+}
 
-    // Validaciones
-    if (!nombre || !clasificacion_id || isNaN(stock)) {
-        alert("Por favor, completa los campos obligatorios (*)");
-        return;
+// Cargar categorías para el filtro
+async function cargarClasificaciones() {
+    const select = document.getElementById("filtroClasificacion");
+    const { data } = await client.from("clasificaciones").select("*").order("nombre");
+    
+    data?.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat.id;
+        option.textContent = cat.nombre;
+        select.appendChild(option);
+    });
+}
+
+// Obtener productos de la base de datos
+async function cargarProductos() {
+    const { data, error } = await client
+        .from("productos")
+        .select(`*, clasificaciones(nombre)`)
+        .order("nombre");
+
+    if (!error) {
+        todosLosProductos = data;
+        renderizarTabla(todosLosProductos);
     }
+}
 
-    try {
-        // BLOQUEO DE BOTÓN: Evita que el usuario haga doble clic y duplique el registro
-        btn.disabled = true;
-        btn.innerText = "GUARDANDO...";
+// Lógica de filtrado
+function aplicarFiltros() {
+    const busqueda = document.getElementById("buscar").value.toLowerCase().trim();
+    const categoriaId = document.getElementById("filtroClasificacion").value;
 
-        const nuevoProducto = {
-            codigo: codigo || null,
-            nombre: nombre,
-            clasificacion_id: clasificacion_id,
-            stock: stock,
-            precio_compra: precio_compra,
-            precio_venta: precio_venta
-        };
-
-        const { data, error } = await client
-            .from("productos")
-            .insert([nuevoProducto]);
-
-        if (error) throw error;
-
-        // Éxito
-        alert("✅ Producto registrado correctamente");
+    const filtrados = todosLosProductos.filter(p => {
+        const nombreMatch = p.nombre.toLowerCase().includes(busqueda);
+        const codigoMatch = p.codigo ? p.codigo.toLowerCase().includes(busqueda) : false;
+        const categoriaMatch = (categoriaId === "todos") || (p.clasificacion_id === categoriaId);
         
-        // Limpiar formulario para evitar re-envíos accidentales
-        document.getElementById("formIngreso").reset();
+        return (nombreMatch || codigoMatch) && categoriaMatch;
+    });
 
-    } catch (error) {
-        alert("❌ Error al guardar: " + error.message);
-        console.error(error);
-    } finally {
-        // DESBLOQUEO DE BOTÓN
+    renderizarTabla(filtrados);
+}
+
+// Mostrar datos en la tabla y calcular totales
+function renderizarTabla(lista) {
+    const tabla = document.getElementById("tablaProductos");
+    const totalCostoHTML = document.getElementById("totalCostoInv");
+    const totalVentaHTML = document.getElementById("totalVentaInv");
+    
+    tabla.innerHTML = "";
+    let acumuladoCosto = 0;
+    let acumuladoVenta = 0;
+
+    lista.forEach(p => {
+        const stock = parseInt(p.stock || 0);
+        const costo = parseFloat(p.precio_compra || 0);
+        const venta = parseFloat(p.precio_venta || 0);
+        const codigo = p.codigo ? p.codigo.toUpperCase() : "N/A";
+
+        acumuladoCosto += (costo * stock);
+        acumuladoVenta += (venta * stock);
+
+        const stockClase = stock <= 5 ? 'stock-alerta' : '';
+        const productoJSON = JSON.stringify(p).replace(/"/g, '&quot;');
+
+        tabla.innerHTML += `
+        <tr>
+            <td data-label="Código"><code>${codigo}</code></td>
+            <td data-label="Producto">${p.nombre}</td>
+            <td data-label="Costo Unit.">Q${costo.toFixed(2)}</td>
+            <td data-label="Precio Venta">Q${venta.toFixed(2)}</td>
+            <td data-label="Stock" class="${stockClase}">${stock}</td>
+            <td data-label="Acciones">
+                <button class="btn btn-purple btn-sm" onclick='abrirModalEditar(${productoJSON})'>Editar</button>
+            </td>
+        </tr>`;
+    });
+
+    totalCostoHTML.innerText = acumuladoCosto.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    totalVentaHTML.innerText = acumuladoVenta.toLocaleString('en-US', { minimumFractionDigits: 2 });
+}
+
+// Gestión de Edición
+function abrirModalEditar(producto) {
+    idEditando = producto.id;
+    document.getElementById("editNombre").value = producto.nombre;
+    document.getElementById("editCosto").value = producto.precio_compra;
+    document.getElementById("editPrecio").value = producto.precio_venta;
+    document.getElementById("editStock").value = producto.stock;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalEditar'));
+    modal.show();
+}
+
+async function guardarCambios() {
+    if (!idEditando) return;
+
+    const btn = document.querySelector("#modalEditar .btn-purple");
+    btn.disabled = true;
+
+    const updateData = {
+        nombre: document.getElementById("editNombre").value,
+        precio_compra: parseFloat(document.getElementById("editCosto").value),
+        precio_venta: parseFloat(document.getElementById("editPrecio").value),
+        stock: parseInt(document.getElementById("editStock").value)
+    };
+
+    const { error } = await client.from("productos").update(updateData).eq("id", idEditando);
+
+    if (error) {
+        alert("❌ Error: " + error.message);
         btn.disabled = false;
-        btn.innerText = "GUARDAR INGRESO";
+    } else {
+        alert("✅ Producto actualizado");
+        const modalElement = document.getElementById('modalEditar');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        modalInstance.hide();
+        btn.disabled = false;
+        await cargarProductos(); // Recargar datos
     }
 }
