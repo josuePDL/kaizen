@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingresos</title>
+    <title>Ingresos - Sistema de Inventario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { --main-purple: #7c3aed; }
-        .bg-success { background-color: var(--main-purple) !important; }
-        .btn-success { 
+        .bg-purple { background-color: var(--main-purple) !important; }
+        .btn-purple { 
             background-color: var(--main-purple) !important; 
-            border-color: var(--main-purple) !important; 
+            border-color: var(--main-purple) !important;
+            color: white !important;
         }
-        .btn-success:hover { filter: brightness(90%); }
+        .btn-purple:hover { filter: brightness(90%); }
         .card { border-radius: 12px; }
     </style>
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-dark bg-success shadow-sm">
+<nav class="navbar navbar-dark bg-purple shadow-sm">
     <div class="container">
-        <span class="navbar-brand fw-bold">Ingresos</span>
-        <a href="index.html" class="btn btn-outline-light btn-sm">Inicio</a>
+        <span class="navbar-brand fw-bold">Registro de Ingresos</span>
+        <a href="index.html" class="btn btn-outline-light btn-sm">Volver al Inventario</a>
     </div>
 </nav>
 
@@ -31,24 +32,26 @@
             <div class="card shadow-sm p-4">
                 <h4 class="mb-4 text-secondary">Registrar Nuevo Producto</h4>
                 
-                <div class="row g-3">
+                <form id="formIngreso" class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label small fw-bold">Código (Opcional)</label>
                         <input id="codigo" class="form-control" placeholder="Ej: A001">
                     </div>
                     <div class="col-md-8">
                         <label class="form-label small fw-bold">Nombre del Producto *</label>
-                        <input id="nombre" class="form-control" placeholder="Nombre completo">
+                        <input id="nombre" class="form-control" placeholder="Nombre completo" required>
                     </div>
 
                     <div class="col-12">
                         <label class="form-label small fw-bold">Clasificación / Categoría *</label>
-                        <select id="clasificacion" class="form-select"></select>
+                        <select id="clasificacion" class="form-select" required>
+                            <option value="">Seleccione una categoría...</option>
+                        </select>
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label small fw-bold">Cantidad *</label>
-                        <input id="cantidad" type="number" class="form-control" placeholder="0">
+                        <label class="form-label small fw-bold">Cantidad Inicial *</label>
+                        <input id="cantidad" type="number" class="form-control" placeholder="0" required min="1">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-bold">Costo Compra (Q)</label>
@@ -60,11 +63,11 @@
                     </div>
 
                     <div class="col-12 mt-4">
-                        <button onclick="guardarIngreso()" class="btn btn-success w-100 py-2 fw-bold text-uppercase">
+                        <button type="button" id="btnGuardar" onclick="guardarIngreso()" class="btn btn-purple w-100 py-2 fw-bold text-uppercase">
                             Guardar Ingreso
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
