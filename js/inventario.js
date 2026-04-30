@@ -1,3 +1,4 @@
+// 1. Configuración de conexión
 const SUPABASE_URL = "https://dbherfalxtdpuekdquso.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiaGVyZmFseHRkcHVla2RxdXNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODY5NTgsImV4cCI6MjA5MzA2Mjk1OH0.ERCeSP2s_0LfPGL5FYy-dKbMIlyRt8Gvg8aZ47DgITA";
 
@@ -7,6 +8,7 @@ const client = createClient(SUPABASE_URL, SUPABASE_KEY);
 let todosLosProductos = [];
 let idEditando = null;
 
+// Inicialización al cargar el DOM
 document.addEventListener("DOMContentLoaded", () => {
     verificarSesion();
 });
@@ -24,15 +26,15 @@ async function inicializarApp() {
     await cargarClasificaciones();
     await cargarProductos();
     
+    // Escuchadores para filtros en tiempo real
     document.getElementById("buscar").addEventListener("input", aplicarFiltros);
     document.getElementById("filtroClasificacion").addEventListener("change", aplicarFiltros);
 }
 
+// Cargar categorías en el select de filtros
 async function cargarClasificaciones() {
-    // ID corregido para que coincida con el HTML
     const select = document.getElementById("filtroClasificacion");
-    
-    if (!select) return; // Evita el error si el elemento no existe
+    if (!select) return;
 
     const { data, error } = await client.from("clasificaciones").select("*").order("nombre");
     
@@ -46,6 +48,7 @@ async function cargarClasificaciones() {
     }
 }
 
+// Obtener lista de productos con su categoría
 async function cargarProductos() {
     const { data, error } = await client
         .from("productos")
@@ -58,6 +61,7 @@ async function cargarProductos() {
     }
 }
 
+// Lógica de búsqueda y filtrado
 function aplicarFiltros() {
     const busqueda = document.getElementById("buscar").value.toLowerCase().trim();
     const categoriaId = document.getElementById("filtroClasificacion").value;
@@ -73,6 +77,7 @@ function aplicarFiltros() {
     renderizarTabla(filtrados);
 }
 
+// Renderizar filas de la tabla y calcular totales
 function renderizarTabla(lista) {
     const tabla = document.getElementById("tablaProductos");
     const totalCostoHTML = document.getElementById("totalCostoInv");
@@ -102,7 +107,10 @@ function renderizarTabla(lista) {
             <td data-label="Venta">Q${venta.toFixed(2)}</td>
             <td data-label="Stock" class="${stockClase}">${stock}</td>
             <td data-label="Acciones">
-                <button class="btn btn-purple btn-sm" onclick='abrirModalEditar(${productoJSON})'>Editar</button>
+                <div class="d-flex justify-content-center gap-2">
+                    <button class="btn btn-purple btn-sm" onclick='abrirModalEditar(${productoJSON})'>Editar</button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="eliminarProductoCompleto('${p.id}')">Borrar</button>
+                </div>
             </td>
         </tr>`;
     });
@@ -110,6 +118,8 @@ function renderizarTabla(lista) {
     totalCostoHTML.innerText = acumuladoCosto.toLocaleString('en-US', { minimumFractionDigits: 2 });
     totalVentaHTML.innerText = acumuladoVenta.toLocaleString('en-US', { minimumFractionDigits: 2 });
 }
+
+// --- FUNCIONES DE EDICIÓN ---
 
 function abrirModalEditar(producto) {
     idEditando = producto.id;
@@ -135,12 +145,45 @@ async function guardarCambios() {
     const { error } = await client.from("productos").update(updateData).eq("id", idEditando);
 
     if (error) {
-        alert("❌ Error: " + error.message);
+        alert("❌ Error al actualizar: " + error.message);
     } else {
-        alert("✅ Producto actualizado");
+        alert("✅ Producto actualizado con éxito");
         const modalElement = document.getElementById('modalEditar');
         const modalInstance = bootstrap.Modal.getInstance(modalElement);
         modalInstance.hide();
         await cargarProductos();
+    }
+}
+
+// --- FUNCIÓN DE ELIMINACIÓN COMPLETA (PRODUCTO + MOVIMIENTOS) ---
+
+async function eliminarProductoCompleto(id) {
+    const confirmacion = confirm("⚠️ ADVERTENCIA: Se eliminará este producto y TODO su historial en la tabla de movimientos. ¿Deseas borrarlo permanentemente?");
+    
+    if (!confirmacion) return;
+
+    try {
+        // 1. Eliminar de movimientos_inventario primero por integridad referencial
+        const { error: errorMovs } = await client
+            .from("movimientos_inventario")
+            .delete()
+            .eq("producto_id", id); // Verifica que el nombre de la columna sea correcto
+
+        if (errorMovs) throw new Error("No se pudieron borrar los movimientos: " + errorMovs.message);
+
+        // 2. Eliminar de la tabla productos
+        const { error: errorProd } = await client
+            .from("productos")
+            .delete()
+            .eq("id", id);
+
+        if (errorProd) throw new Error("No se pudo borrar el producto: " + errorProd.message);
+
+        alert("✅ Producto e historial de movimientos eliminados.");
+        await cargarProductos();
+
+    } catch (error) {
+        alert("❌ " + error.message);
+        console.error(error);
     }
 }
