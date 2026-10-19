@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaizen - Administración</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <!-- Barra de Navegación -->
+  <nav>
+    <div>
+      <a href="index.html">🔍 Buscador</a>
+      <a href="venta.html">🛒 Ventas</a>
+      <a href="admin.html">⚙️ Admin</a>
+    </div>
+  </nav>
+
+  <div class="container flex-2-col">
+    
+    <!-- Panel Izquierdo: Formulario de Registro/Edición -->
+    <div class="col-3 panel">
+      <h2 id="titulo-form">Nuevo Producto</h2>
+      
+      <form id="form" onsubmit="guardar(event)">
+        <!-- Campos del Producto -->
+        <input type="text" id="id" placeholder="ID / Código de Barras" required>
+        <input type="text" id="nombre" placeholder="Nombre del producto" required>
+        <textarea id="desc" placeholder="Descripción del producto" rows="3"></textarea>
+        
+        <label for="costo" style="font-size: 0.9em; color: var(--morado-medio);">Costo de adquisición (Q):</label>
+        <input type="number" id="costo" placeholder="0.00" step="0.01" required>
+        
+        <label for="precio" style="font-size: 0.9em; color: var(--morado-medio);">Precio de venta (Q):</label>
+        <input type="number" id="precio" placeholder="0.00" step="0.01" required>
+        
+        <label for="cantidad" style="font-size: 0.9em; color: var(--morado-medio);">Cantidad / Stock Inicial:</label>
+        <input type="number" id="cantidad" placeholder="Ej. 10" required>
+        
+        <!-- Campo oculto para saber si estamos creando o editando -->
+        <input type="hidden" id="modo" value="crear">
+        
+        <!-- Botones de Acción -->
+        <button type="submit" id="btn-submit">Guardar Producto</button>
+        <button type="button" onclick="cancelar()" class="btn-danger" style="display:none;" id="btn-cancelar">Cancelar Edición</button>
+      </form>
+    </div>
+
+    <!-- Panel Derecho: Tabla de Inventario General -->
+    <div class="col-7 panel" style="overflow-x: auto;">
+      <h2>Inventario General</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th> <!-- ¡NUEVA COLUMNA! -->
+            <th>Costo / Precio</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla">
+          <tr><td colspan="6" style="text-align: center;">Cargando inventario desde Google Sheets...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

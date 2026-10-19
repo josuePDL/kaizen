@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Kaizen - Buscador</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div>
+      <a href="index.html">🔍 Buscador</a>
+      <a href="venta.html">🛒 Ventas</a>
+      <a href="admin.html">⚙️ Admin</a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="panel">
+      <h1>Consultar Inventario</h1>
+      <input type="text" id="buscador" placeholder="Buscar producto por nombre o ID..." onkeyup="filtrar()">
+      <p id="resumen" style="color: var(--morado-medio); font-weight: bold;">Cargando base de datos...</p>
+    </div>
+    <div class="grid-productos" id="grid"></div>
+  </div>
+  <script src="index.js"></script>
+</body>
+</html>
+</html>
