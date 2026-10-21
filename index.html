@@ -8,21 +8,21 @@
 </head>
 <body>
   <nav>
-    <div>
+    <div style="display: flex; justify-content: center; width: 100%; gap: 15px;">
       <a href="index.html">🔍 Buscador</a>
       <a href="venta.html">🛒 Ventas</a>
-      <a href="admin.html">⚙️ Admin</a>
     </div>
   </nav>
+
   <div class="container">
     <div class="panel">
       <h1>Consultar Inventario</h1>
-      <input type="text" id="buscador" placeholder="Buscar producto por nombre o ID..." onkeyup="filtrar()">
+      <input type="text" id="buscador" placeholder="Buscar por Nombre o Código de Barras..." onkeyup="filtrar()">
       <p id="resumen" style="color: var(--morado-medio); font-weight: bold;">Cargando base de datos...</p>
     </div>
     <div class="grid-productos" id="grid"></div>
   </div>
+
   <script src="index.js"></script>
 </body>
-</html>
 </html>
