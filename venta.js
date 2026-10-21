@@ -1,4 +1,4 @@
-const URL_API = "https://script.google.com/macros/s/AKfycbxWNjPiVc07JfL5SoJNVxY47FrgKxfimqJc1HxCoNjKaWuY76AUgbWDgXxICecH2v2t/exec";
+const URL_API = "https://script.google.com/macros/s/AKfycby32Pb0rzz6ruy4T6NGo4PWMaxKvRwb96GeUnWxB8xQUh8757OPUtFSEBs8_SKB4A5U/exec";
 let inventario = [];
 let carrito = [];
 let productoEnSeleccion = null;
@@ -29,9 +29,16 @@ function filtrar() {
   
   document.getElementById("grid").innerHTML = filtrados.map(p => {
     const stock = parseInt(p.cantidad) || 0;
+    
+    // Mostramos la imagen o un cuadro gris si no tiene
+    const imgHtml = p.imagen 
+      ? `<img src="${p.imagen}" alt="${p.nombre}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; background-color: #eee;">` 
+      : `<div style="width: 100%; height: 120px; border-radius: 5px; margin-bottom: 10px; background-color: #eee; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.85em;">Sin Imagen</div>`;
+
     return `
-      <div class="card" style="cursor:pointer; border-color: ${stock > 0 ? 'var(--morado-claro)' : 'red'};" onclick="abrirModal('${p.id}')">
-        <h4>${p.nombre}</h4>
+      <div class="card" style="cursor:pointer; border-color: ${stock > 0 ? 'var(--morado-claro)' : 'red'}; display: flex; flex-direction: column;" onclick="abrirModal('${p.id}')">
+        ${imgHtml}
+        <h4 style="margin: 5px 0;">${p.nombre}</h4>
         <p style="margin:0; font-size: 0.85em; color: #666;">Cód: ${p.id}</p>
         <p style="margin-top:5px;">Q${p.precio.toFixed(2)} | Stock: <strong style="color: ${stock > 0 ? 'inherit' : 'red'};">${stock}</strong></p>
       </div>
@@ -132,15 +139,15 @@ async function cobrar() {
     
     const data = await res.json();
     if (data.exito) {
-      alert("✅ Venta procesada con éxito.");
+      alert("✅ Venta procesada con éxito. Stock descontado.");
       carrito = [];
       renderCarrito();
-      await cargarDatos(); // Recargar el stock
+      await cargarDatos(); // Recargar inventario
     } else {
-      alert("❌ Error: " + data.mensaje);
+      alert("❌ Error del servidor: " + data.mensaje);
     }
   } catch (error) {
-    alert("Error de conexión al procesar venta.");
+    alert("Error de red al procesar la venta.");
   }
   
   document.body.style.cursor = "default";
