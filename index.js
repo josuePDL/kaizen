@@ -1,5 +1,4 @@
-// URL de tu Apps Script vinculada
-const URL_API = "https://script.google.com/macros/s/AKfycbxfZV-pjl4GX8w9iVBlyx55Nv0JTbpS0tBzs2O2pc3O3sgGJAcwNyLe9X4Jf-LkEfwm/exec";
+const URL_API = "https://script.google.com/macros/s/AKfycby32Pb0rzz6ruy4T6NGo4PWMaxKvRwb96GeUnWxB8xQUh8757OPUtFSEBs8_SKB4A5U/exec";
 
 let inventario = [];
 
