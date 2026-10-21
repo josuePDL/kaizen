@@ -3,22 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kaizen - Buscador</title>
+  <title>Kaizen - Catálogo de Productos</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <nav>
-    <div style="display: flex; justify-content: center; width: 100%; gap: 15px;">
-      <a href="index.html">🔍 Buscador</a>
-      <a href="venta.html">🛒 Ventas</a>
+    <div style="display: flex; justify-content: center; width: 100%;">
+      <span style="color: white; font-size: 1.5em; font-weight: bold;">📦 Catálogo Kaizen</span>
     </div>
   </nav>
 
   <div class="container">
     <div class="panel">
-      <h1>Consultar Inventario</h1>
-      <input type="text" id="buscador" placeholder="Buscar por Nombre o Código de Barras..." onkeyup="filtrar()">
-      <p id="resumen" style="color: var(--morado-medio); font-weight: bold;">Cargando base de datos...</p>
+      <input type="text" id="buscador" placeholder="Buscar por Nombre o Código de Barras..." onkeyup="filtrar()" style="font-size: 1.2em; padding: 15px;">
+      <p id="resumen" style="color: var(--morado-medio); font-weight: bold; text-align: center; margin-top: 10px;">Cargando base de datos...</p>
     </div>
     <div class="grid-productos" id="grid"></div>
   </div>
