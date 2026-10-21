@@ -9,11 +9,13 @@
 <body>
   
   <nav>
-    <div style="display: flex; justify-content: center; width: 100%; gap: 15px;">
+    <div style="display: flex; justify-content: center; width: 100%; gap: 15px; align-items: center; flex-wrap: wrap;">
       <a href="index.html">🔍 Buscador</a>
       <a href="venta.html">🛒 Ventas</a>
       <a href="admin.html">⚙️ Admin</a>
-      <a href="https://forms.gle/r4QQE4ZT4xVTjZUp9" target="_blank" style="background: var(--morado-medio); padding: 5px 10px; border-radius: 4px;">➕ Agregar Producto (Form)</a>
+      <button onclick="abrirModalForm()" style="background: var(--morado-claro); color: var(--morado-oscuro); padding: 8px 15px; border-radius: 4px; margin: 0; width: auto; border: 2px solid white;">
+        ➕ Agregar Producto
+      </button>
     </div>
   </nav>
 
@@ -70,6 +72,20 @@
       </table>
     </div>
 
+  </div>
+
+  <!-- MODAL: VENTANA FLOTANTE PARA GOOGLE FORMS -->
+  <div id="modal-form" class="modal-overlay">
+    <div class="modal-content" style="max-width: 800px; width: 95%; height: 90vh; display: flex; flex-direction: column; padding: 15px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2 style="margin: 0; color: var(--morado-oscuro);">Registrar Nuevo Producto</h2>
+        <!-- Al cerrar, se refresca automáticamente la tabla -->
+        <button onclick="cerrarModalForm()" class="btn-danger" style="width: auto; padding: 8px 15px; margin: 0;">✖ Cerrar y Refrescar</button>
+      </div>
+      
+      <!-- AQUÍ ESTÁ TU ENLACE INTEGRADO -->
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScq9EBMKzV99g7B2eDVYEfvPc03oC8MDE_rRSVB_O0UlRbAMQ/viewform?embedded=true" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0" style="flex-grow: 1; border-radius: 5px; border: 1px solid #ccc; background: white;">Cargando formulario...</iframe>
+    </div>
   </div>
 
   <script src="admin.js"></script>
