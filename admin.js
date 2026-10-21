@@ -1,6 +1,7 @@
 // AQUI PEGA LA NUEVA URL QUE TE DIO APPS SCRIPT
 const URL_API = "https://script.google.com/macros/s/AKfycbzfLRPDIGziFyZEzNRjDs54iOb51f_byKxoeaN8JhEEmq5qF6z96oFgLxIYrtpmlNCV/exec";
 
+
 let inventario = [];
 
 document.addEventListener("DOMContentLoaded", cargarDatos);
@@ -45,7 +46,6 @@ async function cargarDatos() {
   }
 }
 
-// Llenar el formulario con los datos actuales
 function seleccionarParaEditar(fila) {
   const prod = inventario.find(p => p.fila === fila);
   if (!prod) return;
@@ -79,7 +79,6 @@ function cancelarEdicion() {
   document.getElementById("titulo-form").innerText = "Editar Producto";
 }
 
-// Guardar los cambios en Google Sheets
 async function guardarEdicion(e) {
   e.preventDefault();
   
@@ -109,7 +108,7 @@ async function guardarEdicion(e) {
     if (data.exito) {
       alert("✅ " + data.mensaje);
       cancelarEdicion();
-      await cargarDatos(); // Refresca la tabla
+      await cargarDatos(); 
     } else {
       alert("❌ Error: " + data.mensaje);
     }
@@ -118,4 +117,18 @@ async function guardarEdicion(e) {
   }
 
   document.body.style.cursor = "default";
+}
+
+// ==========================================
+// FUNCIONES DEL MODAL DE GOOGLE FORMS
+// ==========================================
+
+function abrirModalForm() {
+  document.getElementById("modal-form").style.display = "flex";
+}
+
+function cerrarModalForm() {
+  document.getElementById("modal-form").style.display = "none";
+  // Refrescar la tabla automáticamente al cerrar la ventana para ver los nuevos productos
+  cargarDatos(); 
 }
