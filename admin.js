@@ -1,183 +1,121 @@
-// 🚨 IMPORTANTE: Asegúrate de que esta sea la URL de tu ÚLTIMA implementación en Apps Script
-const URL_API = "https://script.google.com/macros/s/AKfycbwLqDG1D_3x3hl3Um5TBp_iKPRrp8gv6XmtCav8E_hfyUOCCKd-eGmeNjpd8GobsFBBTw/exec";
+// AQUI PEGA LA NUEVA URL QUE TE DIO APPS SCRIPT
+const URL_API = "https://script.google.com/macros/s/AKfycby32Pb0rzz6ruy4T6NGo4PWMaxKvRwb96GeUnWxB8xQUh8757OPUtFSEBs8_SKB4A5U/exec";
 
 let inventario = [];
 
 document.addEventListener("DOMContentLoaded", cargarDatos);
 
-// ==========================================
-// 1. LEER PRODUCTOS (Cargar Tabla)
-// ==========================================
 async function cargarDatos() {
+  const tbody = document.getElementById("tabla-admin");
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Cargando base de datos...</td></tr>`;
+
   try {
-    const res = await fetch(URL_API, { 
-      method: "POST", 
+    const res = await fetch(URL_API, {
+      method: "POST",
       body: JSON.stringify({ accion: "leer" }),
       headers: { "Content-Type": "text/plain;charset=utf-8" }
     });
-    
     const data = await res.json();
     inventario = data.datos || [];
-    
+
     if (inventario.length === 0) {
-      document.getElementById("tabla").innerHTML = `<tr><td colspan="6" style="text-align: center;">No hay productos registrados.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No hay productos en el inventario.</td></tr>`;
       return;
     }
 
-    // Dibujar la tabla, AHORA CON LA DESCRIPCIÓN
-    document.getElementById("tabla").innerHTML = inventario.map(p => `
-      <tr>
-        <td style="font-weight: bold; color: var(--morado-oscuro);">${p.id}</td>
-        <td>${p.nombre}</td>
-        <td style="font-size: 0.85em; color: #555;">${p.descripcion || "Sin descripción"}</td>
-        <td>Q${parseFloat(p.costo).toFixed(2)} / Q${parseFloat(p.precio).toFixed(2)}</td>
-        <td style="color: ${p.cantidad > 0 ? 'inherit' : 'red'}; font-weight:bold; text-align: center;">
-          ${p.cantidad}
-        </td>
-        <td style="text-align: center; width: 140px;">
-          <button class="btn-edit" onclick="prepararEdicion('${p.id}')" style="padding: 5px; width: 45%; font-size: 0.9em;">Editar</button>
-          <button class="btn-danger" onclick="eliminar('${p.id}')" style="padding: 5px; width: 45%; font-size: 0.9em;">Borrar</button>
-        </td>
-      </tr>
-    `).join("");
+    tbody.innerHTML = inventario.map(p => {
+      return `
+        <tr>
+          <td style="font-weight: bold; color: var(--morado-oscuro);">${p.id}</td>
+          <td>
+            <strong>${p.nombre}</strong><br>
+            <small style="color: #666;">${p.descripcion || "Sin descripción"}</small>
+          </td>
+          <td style="font-weight: bold; color: #2e7d32;">Q${p.precio.toFixed(2)}</td>
+          <td style="text-align: center; font-weight: bold; color: ${p.cantidad > 0 ? 'inherit' : 'red'};">${p.cantidad}</td>
+          <td style="text-align: center;">
+            <button class="btn-edit" onclick="seleccionarParaEditar(${p.fila})" style="padding: 6px 12px; font-size: 0.9em;">✏️ Editar</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
 
-  } catch(e) {
-    console.error(e);
-    document.getElementById("tabla").innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Error de conexión con la base de datos.</td></tr>`;
+  } catch (error) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Error al consultar Google Sheets.</td></tr>`;
   }
 }
 
-// ==========================================
-// 2. CREAR O EDITAR PRODUCTO (Guardar)
-// ==========================================
-async function guardar(e) {
-  e.preventDefault(); 
-  
-  document.body.style.cursor = "wait";
+// Llenar el formulario con los datos actuales
+function seleccionarParaEditar(fila) {
+  const prod = inventario.find(p => p.fila === fila);
+  if (!prod) return;
+
+  document.getElementById("prod-fila").value = prod.fila;
+  document.getElementById("prod-codigo").value = prod.id !== "N/A" ? prod.id : "";
+  document.getElementById("prod-nombre").value = prod.nombre;
+  document.getElementById("prod-desc").value = prod.descripcion;
+  document.getElementById("prod-precio").value = prod.precio;
+  document.getElementById("prod-cantidad").value = prod.cantidad;
+
   const btnSubmit = document.getElementById("btn-submit");
-  btnSubmit.disabled = true;
-  btnSubmit.innerText = "Procesando...";
-
-  const modo = document.getElementById("modo").value; 
-  const idIngresado = document.getElementById("id").value.trim();
-
-  if (!idIngresado) {
-    alert("El campo ID es obligatorio.");
-    restaurarBoton();
-    return;
-  }
-  
-  const payload = {
-    accion: modo === "crear" ? "guardar" : "editar", 
-    id: idIngresado, 
-    nombre: document.getElementById("nombre").value.trim(),
-    descripcion: document.getElementById("desc").value.trim(),
-    costo: parseFloat(document.getElementById("costo").value) || 0,
-    precio: parseFloat(document.getElementById("precio").value) || 0,
-    cantidad: parseInt(document.getElementById("cantidad").value) || 0
-  };
-
-  try {
-    const res = await fetch(URL_API, { 
-      method: "POST", 
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "text/plain;charset=utf-8" }
-    });
-    
-    const data = await res.json();
-    
-    if(data.exito) {
-      alert("✅ " + data.mensaje);
-      cancelar(); 
-      await cargarDatos(); 
-    } else {
-      alert("❌ Error: " + data.mensaje); 
-    }
-  } catch(err) {
-    console.error(err);
-    alert("Hubo un error de conexión.");
-  }
-
-  function restaurarBoton() {
-    document.body.style.cursor = "default";
-    btnSubmit.disabled = false;
-    btnSubmit.innerText = modo === "crear" ? "Guardar Producto" : "Actualizar Producto";
-  }
-  
-  restaurarBoton();
-}
-
-// ==========================================
-// 3. PREPARAR INTERFAZ PARA EDICIÓN
-// ==========================================
-function prepararEdicion(idBuscado) {
-  // Aseguramos que la búsqueda se haga como texto
-  const p = inventario.find(x => String(x.id).trim() === String(idBuscado).trim());
-  if (!p) {
-    alert("Error: No se encontró el producto en la memoria local.");
-    return;
-  }
-
-  document.getElementById("id").value = p.id;
-  document.getElementById("id").readOnly = true; 
-  document.getElementById("id").style.backgroundColor = "#e9ecef";
-  
-  document.getElementById("nombre").value = p.nombre;
-  document.getElementById("desc").value = p.descripcion || ""; // Muestra la descripción en el formulario
-  document.getElementById("costo").value = p.costo;
-  document.getElementById("precio").value = p.precio;
-  document.getElementById("cantidad").value = p.cantidad;
-  
-  document.getElementById("modo").value = "editar";
-  document.getElementById("titulo-form").innerText = "Editar Producto";
-  document.getElementById("btn-submit").innerText = "Actualizar Producto";
+  btnSubmit.disabled = false;
+  btnSubmit.innerText = "💾 Actualizar Producto";
   document.getElementById("btn-cancelar").style.display = "block";
+  
+  document.getElementById("titulo-form").innerText = "Editando fila " + prod.fila;
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ==========================================
-// 4. CANCELAR EDICIÓN (Limpiar form)
-// ==========================================
-function cancelar() {
-  document.getElementById("form").reset();
+function cancelarEdicion() {
+  document.getElementById("form-editar").reset();
+  document.getElementById("prod-fila").value = "";
   
-  const inputId = document.getElementById("id");
-  inputId.readOnly = false;
-  inputId.style.backgroundColor = "white";
+  const btnSubmit = document.getElementById("btn-submit");
+  btnSubmit.disabled = true;
+  btnSubmit.innerText = "Selecciona un producto";
   
-  document.getElementById("modo").value = "crear";
-  document.getElementById("titulo-form").innerText = "Nuevo Producto";
-  document.getElementById("btn-submit").innerText = "Guardar Producto";
   document.getElementById("btn-cancelar").style.display = "none";
+  document.getElementById("titulo-form").innerText = "Editar Producto";
 }
 
-// ==========================================
-// 5. ELIMINAR PRODUCTO
-// ==========================================
-async function eliminar(idBuscado) {
-  if(!confirm("¿Borrar el producto con ID: " + idBuscado + "?")) return;
+// Guardar los cambios en Google Sheets
+async function guardarEdicion(e) {
+  e.preventDefault();
   
   document.body.style.cursor = "wait";
-  
+  const btn = document.getElementById("btn-submit");
+  btn.disabled = true;
+  btn.innerText = "Guardando cambios...";
+
+  const payload = {
+    accion: "editar",
+    fila: document.getElementById("prod-fila").value,
+    id: document.getElementById("prod-codigo").value.trim(),
+    nombre: document.getElementById("prod-nombre").value.trim(),
+    descripcion: document.getElementById("prod-desc").value.trim(),
+    precio: parseFloat(document.getElementById("prod-precio").value) || 0,
+    cantidad: parseInt(document.getElementById("prod-cantidad").value) || 0
+  };
+
   try {
-    const res = await fetch(URL_API, { 
-      method: "POST", 
-      body: JSON.stringify({ accion: "eliminar", id: String(idBuscado).trim() }),
+    const res = await fetch(URL_API, {
+      method: "POST",
+      body: JSON.stringify(payload),
       headers: { "Content-Type": "text/plain;charset=utf-8" }
     });
-    
     const data = await res.json();
-    
-    if(data.exito) {
-      alert("✅ Producto eliminado.");
-      await cargarDatos(); 
+
+    if (data.exito) {
+      alert("✅ " + data.mensaje);
+      cancelarEdicion();
+      await cargarDatos(); // Refresca la tabla
     } else {
       alert("❌ Error: " + data.mensaje);
     }
-  } catch(e) {
-    alert("Error de conexión al intentar eliminar.");
+  } catch (err) {
+    alert("Error de conexión al guardar los cambios.");
   }
-  
+
   document.body.style.cursor = "default";
 }
