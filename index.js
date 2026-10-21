@@ -1,4 +1,4 @@
-const URL_API = "https://script.google.com/macros/s/AKfycbwLqDG1D_3x3hl3Um5TBp_iKPRrp8gv6XmtCav8E_hfyUOCCKd-eGmeNjpd8GobsFBBTw/exec";
+const URL_API = "https://script.google.com/macros/s/AKfycbxWNjPiVc07JfL5SoJNVxY47FrgKxfimqJc1HxCoNjKaWuY76AUgbWDgXxICecH2v2t/exec";
 let inventario = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -18,18 +18,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function filtrar() {
   const texto = document.getElementById("buscador").value.toLowerCase();
-  const filtrados = inventario.filter(p => p.nombre.toLowerCase().includes(texto) || p.id.toLowerCase().includes(texto));
+  const filtrados = inventario.filter(p => 
+    p.nombre.toLowerCase().includes(texto) || 
+    p.id.toLowerCase().includes(texto)
+  );
   
   document.getElementById("resumen").innerText = `Mostrando ${filtrados.length} producto(s)`;
   
-  const grid = document.getElementById("grid");
-  grid.innerHTML = filtrados.map(p => `
-    <div class="card">
+  document.getElementById("grid").innerHTML = filtrados.map(p => `
+    <div class="card" style="border-color: ${p.cantidad > 0 ? 'var(--morado-claro)' : 'red'};">
       <h3>${p.nombre}</h3>
-      <p style="color:#666; font-size:0.9em">${p.descripcion}</p>
+      <p style="color:#666; font-size:0.9em">${p.descripcion || "Sin descripción"}</p>
       <div style="margin: 10px 0;">
-        <span class="badge">ID: ${p.id}</span>
-        <span class="badge" style="background:#2e7d32">Q${p.precio}</span>
+        <span class="badge" style="background:#555;">Código: ${p.id}</span>
+        <span class="badge" style="background:#2e7d32">Q${p.precio.toFixed(2)}</span>
       </div>
       <h4 style="color: ${p.cantidad > 0 ? 'var(--morado-oscuro)' : 'red'}">
         Stock disponible: ${p.cantidad}
