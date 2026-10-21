@@ -8,29 +8,33 @@
 </head>
 <body>
   <nav>
-    <div>
+    <div style="display: flex; justify-content: center; width: 100%; gap: 15px;">
       <a href="index.html">🔍 Buscador</a>
       <a href="venta.html">🛒 Ventas</a>
-      <a href="admin.html">⚙️ Admin</a>
     </div>
   </nav>
 
   <div class="container flex-2-col">
+    <!-- Panel Catálogo -->
     <div class="col-7 panel">
       <h2>Productos (Clic para vender)</h2>
-      <input type="text" id="buscador" placeholder="Buscar producto..." onkeyup="filtrar()">
+      <input type="text" id="buscador" placeholder="Buscar por Nombre o Código de barras..." onkeyup="filtrar()">
       <div class="grid-productos" id="grid"></div>
     </div>
 
+    <!-- Panel Carrito -->
     <div class="col-3 panel" style="background: var(--morado-oscuro); color: white;">
-      <h2 style="color: white;">Carrito</h2>
-      <div id="carrito-lista" style="min-height: 200px;"></div>
+      <h2 style="color: white; margin-top: 0;">Carrito</h2>
+      <div id="carrito-lista" style="min-height: 200px;">
+        <p style="text-align: center; color: #ce93d8;">El carrito está vacío</p>
+      </div>
       <hr style="border-color: var(--morado-claro);">
       <h3>Total: Q<span id="total">0.00</span></h3>
       <button onclick="cobrar()" style="background: white; color: var(--morado-oscuro); font-size: 1.2em;">Cobrar Venta</button>
     </div>
   </div>
 
+  <!-- Modal para seleccionar cantidad -->
   <div id="modal-cantidad" class="modal-overlay">
     <div class="modal-content">
       <h2 id="modal-titulo" style="color: var(--morado-oscuro); margin-top: 0;">Producto</h2>
@@ -38,7 +42,7 @@
       <label for="modal-input-cant">Cantidad a vender:</label>
       <input type="number" id="modal-input-cant" value="1" min="1">
       <div class="flex-botones">
-        <button onclick="confirmarAgregar()">Agregar</button>
+        <button onclick="confirmarAgregar()">Agregar al Carrito</button>
         <button onclick="cerrarModal()" class="btn-danger">Cancelar</button>
       </div>
     </div>
