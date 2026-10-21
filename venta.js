@@ -1,13 +1,10 @@
-// ✅ Tu nueva URL ya está integrada
-const URL_API = "https://script.google.com/macros/s/AKfycbwLqDG1D_3x3hl3Um5TBp_iKPRrp8gv6XmtCav8E_hfyUOCCKd-eGmeNjpd8GobsFBBTw/exec";
-
+const URL_API = "https://script.google.com/macros/s/AKfycbxWNjPiVc07JfL5SoJNVxY47FrgKxfimqJc1HxCoNjKaWuY76AUgbWDgXxICecH2v2t/exec";
 let inventario = [];
 let carrito = [];
 let productoEnSeleccion = null;
 
 document.addEventListener("DOMContentLoaded", cargarDatos);
 
-// 1. Cargar datos del inventario
 async function cargarDatos() {
   try {
     const res = await fetch(URL_API, { 
@@ -19,11 +16,10 @@ async function cargarDatos() {
     inventario = data.datos || [];
     filtrar();
   } catch(e) {
-    document.getElementById("grid").innerHTML = "<p style='color:red;'>Error al conectar con la base de datos.</p>";
+    document.getElementById("grid").innerHTML = "<p style='color:red;'>Error al cargar el inventario.</p>";
   }
 }
 
-// 2. Mostrar catálogo en pantalla
 function filtrar() {
   const txt = document.getElementById("buscador").value.toLowerCase();
   const filtrados = inventario.filter(p => 
@@ -32,23 +28,19 @@ function filtrar() {
   );
   
   document.getElementById("grid").innerHTML = filtrados.map(p => {
-    const stock = parseInt(p.cantidad) || 0; // Forzamos a que sea número matemático
-    const precio = parseFloat(p.precio) || 0;
-    
+    const stock = parseInt(p.cantidad) || 0;
     return `
       <div class="card" style="cursor:pointer; border-color: ${stock > 0 ? 'var(--morado-claro)' : 'red'};" onclick="abrirModal('${p.id}')">
         <h4>${p.nombre}</h4>
-        <p>Q${precio.toFixed(2)} | Stock: <strong style="color: ${stock > 0 ? 'inherit' : 'red'};">${stock}</strong></p>
+        <p style="margin:0; font-size: 0.85em; color: #666;">Cód: ${p.id}</p>
+        <p style="margin-top:5px;">Q${p.precio.toFixed(2)} | Stock: <strong style="color: ${stock > 0 ? 'inherit' : 'red'};">${stock}</strong></p>
       </div>
     `;
   }).join("");
 }
 
-// 3. Abrir ventana de cantidad
 function abrirModal(idBuscado) {
-  // 🔥 CORRECCIÓN CLAVE: Obligamos a comparar ambos como Texto para que nunca falle
   const prod = inventario.find(p => String(p.id).trim() === String(idBuscado).trim());
-  
   if (!prod) return alert("Error: No se pudo localizar el producto.");
   
   const stock = parseInt(prod.cantidad) || 0;
@@ -60,86 +52,76 @@ function abrirModal(idBuscado) {
   
   const inputCant = document.getElementById("modal-input-cant");
   inputCant.value = 1;
-  inputCant.max = stock; // Evita subir de más con las flechitas
+  inputCant.max = stock;
   
   document.getElementById("modal-cantidad").style.display = "flex";
 }
 
-// 4. Cerrar ventana
 function cerrarModal() {
   document.getElementById("modal-cantidad").style.display = "none";
   productoEnSeleccion = null;
 }
 
-// 5. Confirmar y pasar al carrito
 function confirmarAgregar() {
-  const cantidadDeseada = parseInt(document.getElementById("modal-input-cant").value);
-  if (isNaN(cantidadDeseada) || cantidadDeseada <= 0) return alert("Ingresa una cantidad válida.");
+  const cantidad = parseInt(document.getElementById("modal-input-cant").value);
+  if (isNaN(cantidad) || cantidad <= 0) return alert("Cantidad inválida.");
   
   const stockDisponible = parseInt(productoEnSeleccion.cantidad) || 0;
-  
-  // Buscar si ya estaba en el carrito (también comparando como texto)
   const itemExistente = carrito.find(c => String(c.id) === String(productoEnSeleccion.id));
   
   if (itemExistente) {
-    // Si ya existe, sumar lo viejo con lo nuevo y verificar que no pase el stock
-    if ((itemExistente.cantidadVenta + cantidadDeseada) > stockDisponible) {
-      return alert(`❌ No puedes agregar ${cantidadDeseada} más. Supera tu stock total de ${stockDisponible} unidades.`);
+    if ((itemExistente.cantidadVenta + cantidad) > stockDisponible) {
+      return alert("La cantidad sumada supera el stock disponible.");
     }
-    itemExistente.cantidadVenta += cantidadDeseada;
+    itemExistente.cantidadVenta += cantidad;
   } else {
-    // Si es nuevo en el carrito
-    if (cantidadDeseada > stockDisponible) {
-      return alert("❌ La cantidad supera el stock.");
-    }
-    // Agregar copia al carrito
-    carrito.push({ ...productoEnSeleccion, cantidadVenta: cantidadDeseada });
+    if (cantidad > stockDisponible) return alert("La cantidad supera el stock.");
+    carrito.push({ ...productoEnSeleccion, cantidadVenta: cantidad });
   }
 
   cerrarModal();
   renderCarrito();
 }
 
-// 6. Quitar un producto del carrito
 function quitarDelCarrito(index) {
   carrito.splice(index, 1);
   renderCarrito();
 }
 
-// 7. Dibujar lista de compras en la derecha
 function renderCarrito() {
   let total = 0;
-  
-  document.getElementById("carrito-lista").innerHTML = carrito.map((c, index) => {
-    const precio = parseFloat(c.precio) || 0;
-    const subtotal = precio * c.cantidadVenta;
+  if(carrito.length === 0) {
+    document.getElementById("carrito-lista").innerHTML = '<p style="text-align: center; color: #ce93d8;">El carrito está vacío</p>';
+    document.getElementById("total").innerText = "0.00";
+    return;
+  }
+
+  document.getElementById("carrito-lista").innerHTML = carrito.map((c, i) => {
+    const subtotal = c.precio * c.cantidadVenta;
     total += subtotal;
-    
     return `
-      <div style="background: white; color: var(--texto); margin-bottom: 10px; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--morado-medio);">
+      <div style="background: white; color: var(--texto); margin-bottom: 10px; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <div style="font-weight: bold;">${c.nombre}</div>
-          <div style="font-size: 0.9em;">${c.cantidadVenta} und(s) x Q${precio.toFixed(2)}</div>
+          <div style="font-weight: bold; font-size: 0.9em;">${c.nombre}</div>
+          <div style="font-size: 0.85em;">${c.cantidadVenta}x Q${c.precio.toFixed(2)}</div>
         </div>
         <div style="text-align: right;">
-          <div style="font-weight: bold; margin-bottom: 5px; color: var(--morado-oscuro);">Q${subtotal.toFixed(2)}</div>
-          <button onclick="quitarDelCarrito(${index})" style="padding:4px 8px; font-size: 0.8em; background:#e74c3c; width:auto; border-radius:3px;">Quitar</button>
+          <div style="font-weight: bold; margin-bottom: 5px;">Q${subtotal.toFixed(2)}</div>
+          <button onclick="quitarDelCarrito(${i})" style="padding:4px 8px; font-size: 0.8em; background:#e74c3c; width:auto;">X</button>
         </div>
       </div>
     `;
   }).join("");
-  
   document.getElementById("total").innerText = total.toFixed(2);
 }
 
-// 8. Procesar Venta (Descontar en Sheets)
 async function cobrar() {
   if (carrito.length === 0) return alert("El carrito está vacío.");
   
   document.body.style.cursor = "wait";
-  const botonCobrar = document.querySelector(".col-3 button");
-  botonCobrar.disabled = true;
-  botonCobrar.innerText = "Cobrando...";
+  const btn = document.querySelector(".col-3 button");
+  btn.disabled = true;
+  btn.innerText = "Procesando...";
   
   try {
     const res = await fetch(URL_API, { 
@@ -150,18 +132,18 @@ async function cobrar() {
     
     const data = await res.json();
     if (data.exito) {
-      alert("✅ Venta procesada con éxito. Stock descontado de la base de datos.");
-      carrito = []; // Vaciamos carrito
+      alert("✅ Venta procesada con éxito.");
+      carrito = [];
       renderCarrito();
-      await cargarDatos(); // Refrescamos el inventario para ver el stock actualizado
+      await cargarDatos(); // Recargar el stock
     } else {
       alert("❌ Error: " + data.mensaje);
     }
   } catch (error) {
-    alert("Hubo un problema de conexión. Revisa tu internet.");
+    alert("Error de conexión al procesar venta.");
   }
   
   document.body.style.cursor = "default";
-  botonCobrar.disabled = false;
-  botonCobrar.innerText = "Cobrar Venta";
+  btn.disabled = false;
+  btn.innerText = "Cobrar Venta";
 }
