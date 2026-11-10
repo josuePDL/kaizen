@@ -1,5 +1,4 @@
-const URL_API = "https://script.google.com/macros/s/AKfycby32Pb0rzz6ruy4T6NGo4PWMaxKvRwb96GeUnWxB8xQUh8757OPUtFSEBs8_SKB4A5U/exec";
-
+const API_URL = "https://script.google.com/macros/s/AKfycbzfLRPDIGziFyZEzNRjDs54iOb51f_byKxoeaN8JhEEmq5qF6z96oFgLxIYrtpmlNCV/exec";
 let inventario = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
