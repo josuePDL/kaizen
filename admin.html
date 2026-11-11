@@ -7,41 +7,47 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  
   <nav>
     <div style="display: flex; justify-content: center; width: 100%; gap: 15px; align-items: center; flex-wrap: wrap;">
       <a href="index.html">🔍 Buscador</a>
       <a href="venta.html">🛒 Ventas</a>
-      <a href="admin.html">⚙️ Admin</a>
-      <button onclick="abrirModalForm()" style="background: var(--morado-claro); color: var(--morado-oscuro); padding: 8px 15px; border-radius: 4px; margin: 0; width: auto; border: 2px solid white;">
+      <a href="admin.html" style="background: var(--morado-claro); color: var(--morado-oscuro);">⚙️ Admin</a>
+      <button onclick="abrirModalForm()" style="background: #fff; color: var(--morado-oscuro); padding: 8px 18px; border-radius: 20px; margin: 0; width: auto; font-size: 0.95em;">
         ➕ Agregar Producto
       </button>
     </div>
   </nav>
 
   <div class="container flex-2-col">
-    
     <!-- Panel de Edición -->
     <div class="col-3 panel">
       <h2 id="titulo-form">Editar Producto</h2>
-      <p style="font-size: 0.85em; color: #666;">Selecciona un producto de la tabla para corregir sus datos.</p>
+      <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Selecciona un producto de la tabla para modificar sus datos.</p>
       
       <form id="form-editar" onsubmit="guardarEdicion(event)">
         <input type="hidden" id="prod-fila" value="">
 
-        <label style="font-size: 0.85em; color: var(--morado-medio); font-weight: bold;">Código / ID de Barras:</label>
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Código / ID de Barras:</label>
         <input type="text" id="prod-codigo" required>
 
-        <label style="font-size: 0.85em; color: var(--morado-medio);">Nombre del producto:</label>
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Nombre del producto:</label>
         <input type="text" id="prod-nombre" required>
 
-        <label style="font-size: 0.85em; color: var(--morado-medio);">Descripción:</label>
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Descripción:</label>
         <textarea id="prod-desc" rows="3"></textarea>
 
-        <label style="font-size: 0.85em; color: var(--morado-medio);">Precio Venta (Q):</label>
-        <input type="number" id="prod-precio" step="0.01" required>
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Precio Costo:</label>
+                <input type="number" id="prod-costo" step="0.01" required>
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Precio Venta:</label>
+                <input type="number" id="prod-precio" step="0.01" required>
+            </div>
+        </div>
 
-        <label style="font-size: 0.85em; color: var(--morado-medio);">Cantidad / Stock:</label>
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Cantidad / Stock:</label>
         <input type="number" id="prod-cantidad" required>
 
         <button type="submit" id="btn-submit" disabled>Selecciona un producto</button>
@@ -49,45 +55,62 @@
       </form>
     </div>
 
-    <!-- Tabla de Inventario -->
-    <div class="col-7 panel" style="overflow-x: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h2>Inventario General</h2>
-        <button onclick="cargarDatos()" style="width: auto; padding: 6px 12px; font-size: 0.9em;">🔄 Refrescar</button>
+    <!-- Tabla y Resumen -->
+    <div class="col-7 panel">
+      
+      <!-- DASHBOARD DE TOTALES -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px;">
+        <div style="background: #f3e5f5; padding: 15px; border-radius: 12px; border-left: 5px solid var(--morado-oscuro);">
+          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">CANTIDAD PRODUCTOS</p>
+          <h3 id="metric-productos" style="margin: 5px 0 0 0; font-size: 1.4em; color: var(--morado-oscuro);">0</h3>
+        </div>
+        <div style="background: #e8f5e9; padding: 15px; border-radius: 12px; border-left: 5px solid #2e7d32;">
+          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">TOTAL COSTO (INVERSIÓN)</p>
+          <h3 id="metric-costo" style="margin: 5px 0 0 0; font-size: 1.4em; color: #2e7d32;">Q0.00</h3>
+        </div>
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 12px; border-left: 5px solid #1565c0;">
+          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">TOTAL VENTA (PROYECCIÓN)</p>
+          <h3 id="metric-venta" style="margin: 5px 0 0 0; font-size: 1.4em; color: #1565c0;">Q0.00</h3>
+        </div>
+        <div style="background: #fff3e0; padding: 15px; border-radius: 12px; border-left: 5px solid #e65100;">
+          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">GANANCIA ESPERADA</p>
+          <h3 id="metric-ganancia" style="margin: 5px 0 0 0; font-size: 1.4em; color: #e65100;">Q0.00</h3>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+        <h2 style="margin-bottom: 5px;">Inventario General</h2>
+        <button onclick="cargarDatos()" style="width: auto; padding: 8px 15px; font-size: 0.9em; border-radius: 20px;">🔄 Refrescar Tabla</button>
       </div>
       
-      <table>
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Nombre / Descripción</th>
-            <th>Precio</th>
-            <th>Stock</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-admin">
-          <tr><td colspan="5" style="text-align: center;">Cargando inventario...</td></tr>
-        </tbody>
-      </table>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre / Descripción</th>
+              <th>Precios (Q)</th>
+              <th>Stock</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-admin">
+            <tr><td colspan="5" style="text-align: center; padding: 30px;">Cargando inventario...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-
   </div>
 
-  <!-- MODAL: VENTANA FLOTANTE PARA GOOGLE FORMS -->
   <div id="modal-form" class="modal-overlay">
     <div class="modal-content" style="max-width: 800px; width: 95%; height: 90vh; display: flex; flex-direction: column; padding: 15px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2 style="margin: 0; color: var(--morado-oscuro);">Registrar Nuevo Producto</h2>
-        <!-- Al cerrar, se refresca automáticamente la tabla -->
-        <button onclick="cerrarModalForm()" class="btn-danger" style="width: auto; padding: 8px 15px; margin: 0;">✖ Cerrar y Refrescar</button>
+        <button onclick="cerrarModalForm()" class="btn-danger" style="width: auto; padding: 8px 15px; margin: 0; border-radius: 20px;">✖ Cerrar y Refrescar</button>
       </div>
-      
-      <!-- AQUÍ ESTÁ TU ENLACE INTEGRADO -->
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScq9EBMKzV99g7B2eDVYEfvPc03oC8MDE_rRSVB_O0UlRbAMQ/viewform?embedded=true" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0" style="flex-grow: 1; border-radius: 5px; border: 1px solid #ccc; background: white;">Cargando formulario...</iframe>
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScq9EBMKzV99g7B2eDVYEfvPc03oC8MDE_rRSVB_O0UlRbAMQ/viewform?embedded=true" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0" style="flex-grow: 1; border-radius: 8px; border: 1px solid #eee; background: white;"></iframe>
     </div>
   </div>
-
   <script src="admin.js"></script>
 </body>
 </html>

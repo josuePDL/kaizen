@@ -10,7 +10,7 @@
   <nav>
     <div style="display: flex; justify-content: center; width: 100%; gap: 15px;">
       <a href="index.html">🔍 Buscador</a>
-      <a href="venta.html">🛒 Ventas</a>
+      <a href="venta.html" style="background: var(--morado-claro); color: var(--morado-oscuro);">🛒 Ventas</a>
     </div>
   </nav>
 
@@ -39,10 +39,10 @@
     <div class="modal-content">
       <h2 id="modal-titulo" style="color: var(--morado-oscuro); margin-top: 0;">Producto</h2>
       <p style="color: #666; font-weight: bold;">Stock disponible: <span id="modal-stock"></span></p>
-      <label for="modal-input-cant">Cantidad a vender:</label>
-      <input type="number" id="modal-input-cant" value="1" min="1">
-      <div class="flex-botones">
-        <button onclick="confirmarAgregar()">Agregar al Carrito</button>
+      <label for="modal-input-cant" style="display:block; margin-bottom: 5px; text-align:left; font-size: 0.9em; font-weight:bold;">Cantidad a vender:</label>
+      <input type="number" id="modal-input-cant" value="1" min="1" style="text-align:center; font-size:1.2em;">
+      <div class="flex-botones" style="margin-top: 15px;">
+        <button onclick="confirmarAgregar()">Añadir</button>
         <button onclick="cerrarModal()" class="btn-danger">Cancelar</button>
       </div>
     </div>
