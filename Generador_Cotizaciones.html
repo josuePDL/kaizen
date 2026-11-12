@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kaizen - Cotizaciones</title>
+  <style>
+    :root {
+      --purple: #8f72bd;
+      --purple-dark: #5b34a5;
+      --purple-soft: #efe9f8;
+      --ink: #22242a;
+      --muted: #6c7280;
+      --border: #ded9e8;
+      --surface: #ffffff;
+      --page: #f5f3f8;
+      --danger: #b42318;
+      --shadow: 0 18px 50px rgba(46, 28, 74, .12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--ink);
+      background-color: #f8f0fc;
+    }
+
+    /* Barra de Navegación Uniforme */
+    nav {
+      background-color: #4a148c;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-bottom: 20px;
+    }
+    nav a {
+      color: #ffffff; text-decoration: none;
+      font-weight: bold; padding: 8px 16px;
+      border-radius: 20px; transition: all 0.3s ease;
+      background: rgba(255,255,255,0.1);
+    }
+    nav a:hover, nav a:active {
+      background-color: #ce93d8;
+      color: #4a148c;
+      transform: translateY(-2px);
+    }
+    nav a.active {
+       background-color: #ce93d8;
+       color: #4a148c;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app-shell {
+      width: min(1500px, 100%);
+      margin: 0 auto;
+      padding: 0 24px 24px 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .topbar h1 { margin: 0; font-size: clamp(1.35rem, 2vw, 2rem); color: #4a148c; }
+    .topbar p { margin: 5px 0 0; color: var(--muted); font-size: .95rem; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 470px) minmax(650px, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .editor {
+      position: sticky;
+      top: 16px;
+      display: grid;
+      gap: 14px;
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 17px;
+      box-shadow: 0 8px 24px rgba(46, 28, 74, .06);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 13px;
+    }
+    .panel-title h2 { margin: 0; font-size: 1rem; color: #4a148c;}
+    .badge {
+      color: var(--purple-dark);
+      background: var(--purple-soft);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-weight: 700;
+      font-size: .75rem;
+    }
+
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    label { color: #4a148c; font-size: .85em; font-weight: 700; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px 11px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #7b1fa2;
+      box-shadow: 0 0 0 3px rgba(123, 31, 162, 0.15);
+    }
+    textarea { min-height: 132px; resize: vertical; line-height: 1.45; }
+
+    .products-editor { display: grid; gap: 10px; }
+    .product-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 80px 112px 36px;
+      gap: 8px;
+      align-items: end;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: #fbfafe;
+    }
+    .product-row .subtotal-mini {
+      grid-column: 1 / -1;
+      text-align: right;
+      color: var(--purple-dark);
+      font-weight: 800;
+      font-size: .84rem;
+    }
+    .icon-btn {
+      width: 36px;
+      height: 40px;
+      border: 0;
+      border-radius: 10px;
+      background: #fce8e6;
+      color: var(--danger);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+    .icon-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-weight: 800;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    .btn-primary { background: #7b1fa2; color: #fff; }
+    .btn-soft { background: #f3e5f5; color: #7b1fa2; }
+    .btn-outline { background: #fff; color: #7b1fa2; border: 1px solid #ce93d8; }
+    .btn-danger { background: #e53935; color: #fff;}
+    .btn-wide { width: 100%; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .actions .btn-primary { grid-column: 1 / -1; }
+
+    /* Modal Catálogo */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000;
+      padding: 20px; box-sizing: border-box; backdrop-filter: blur(4px);
+    }
+    .modal-content {
+      background: var(--surface); padding: 30px; border-radius: 12px;
+      width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: left; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .modal-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;
+    }
+    .modal-card {
+        border: 1px solid #eee; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; border-top: 4px solid #7b1fa2; background: #fff;
+    }
+    .modal-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
+    .modal-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 5px; margin-bottom: 10px;}
+
+    .preview-wrap { overflow: auto; padding-bottom: 10px; }
+    .quote-page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: var(--shadow);
+      border-radius: 4px;
+      padding: 14mm 15mm 12mm;
+      display: flex;
+      flex-direction: column;
+      gap: 9mm;
+    }
+
+    .quote-header {
+      display: grid;
+      grid-template-columns: 1fr 1.06fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .brand-logo { width: 170px; height: 170px; object-fit: contain; display: block; }
+    .quote-title-box { border: 1.5px solid #222; border-radius: 2px; overflow: hidden; }
+    .quote-title {
+      background: #b4a7d6;
+      min-height: 92px;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .quote-number { display: grid; grid-template-columns: 70px 1fr; border-top: 1px solid #222; }
+    .quote-number span { padding: 8px 10px; text-align: center; }
+    .quote-number span:first-child { background: #b4a7d6; border-right: 1px solid #222; font-weight: 800; }
+
+    .company-info {
+      font-size: .87rem;
+      line-height: 1.45;
+      border-bottom: 1px solid #222;
+      padding-bottom: 7px;
+    }
+    .company-info strong { display: block; margin-top: 4px; }
+
+    .client-grid {
+      display: grid;
+      grid-template-columns: 1fr 190px;
+      gap: 16px;
+      align-items: start;
+    }
+    .box { border: 1px solid #222; }
+    .box-title { background: #b4a7d6; font-weight: 800; padding: 7px 10px; border-bottom: 1px solid #222; }
+    .info-row { display: grid; grid-template-columns: 82px 1fr; min-height: 34px; border-bottom: 1px solid #222; }
+    .info-row:last-child { border-bottom: 0; }
+    .info-row > div { padding: 7px 9px; }
+    .info-row > div:first-child { border-right: 1px solid #222; font-weight: 700; }
+    .date-box .date-value { padding: 10px; text-align: center; min-height: 39px; }
+
+    .quote-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: .84rem; }
+    .quote-table th, .quote-table td { border: 1px solid #222; padding: 7px 8px; vertical-align: middle; }
+    .quote-table th { background: #b4a7d6; text-align: center; }
+    .quote-table .col-no { width: 48px; text-align: center; }
+    .quote-table .col-qty { width: 82px; text-align: center; }
+    .quote-table .col-price { width: 110px; text-align: right; }
+    .quote-table .col-sub { width: 120px; text-align: right; }
+    .quote-table td.desc { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .empty-products { color: #969aa5; text-align: center; font-style: italic; }
+
+    .totals { display: flex; justify-content: flex-end; margin-top: -1px; }
+    .totals-table { border-collapse: collapse; min-width: 290px; font-size: .9rem; }
+    .totals-table td { border: 1px solid #222; padding: 8px 10px; }
+    .totals-table td:first-child { font-weight: 800; text-align: center; }
+    .totals-table td:last-child { font-weight: 900; text-align: right; }
+    .tax-note { text-align: right; font-size: .78rem; margin-top: 5px; color: #4d515b; }
+
+    .notes-signature {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(190px, .7fr);
+      gap: 20px;
+      align-items: end;
+      margin-top: auto;
+    }
+    .notes-box { border-top: 1px solid #222; }
+    .notes-title { background: #b4a7d6; border: 1px solid #222; border-top: 0; padding: 7px 10px; font-weight: 800; width: 100%; }
+    .notes-list { margin: 10px 0 0; padding-left: 20px; font-size: .8rem; line-height: 1.48; }
+    .notes-list li { margin-bottom: 4px; }
+    .signature-box { text-align: center; }
+    .signature-img { width: 150px; max-height: 80px; object-fit: contain; mix-blend-mode: multiply; }
+    .signature-name { border-top: 1px solid #222; padding-top: 6px; font-size: .78rem; }
+
+    .contact-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 2mm;
+      font-size: .82rem;
+    }
+    .contact-item { display: flex; align-items: center; justify-content: center; gap: 9px; }
+    .contact-item img { width: 26px; height: 26px; object-fit: contain; }
+    .thanks { text-align: center; margin-top: 4mm; font-size: .8rem; color: #4f535e; }
+
+    .saved-indicator {
+      opacity: 0;
+      transition: opacity .2s ease;
+      color: var(--purple-dark);
+      font-size: .8rem;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 6px;
+    }
+    .saved-indicator.show { opacity: 1; }
+
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: 1fr; }
+      .editor { position: static; max-height: none; overflow: visible; }
+      .preview-wrap { border-top: 1px solid var(--border); padding-top: 20px; }
+    }
+
+    @media (max-width: 650px) {
+      .app-shell { padding: 12px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .field-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .product-row { grid-template-columns: minmax(0, 1fr) 76px 100px 36px; }
+      .actions { grid-template-columns: 1fr; }
+      .actions .btn-primary { grid-column: auto; }
+      .preview-wrap { margin-inline: -12px; padding-inline: 12px; }
+      .quote-page { transform-origin: top left; }
+    }
+
+    @media print {
+      @page { size: A4; margin: 0; }
+      body { background: #fff; }
+      nav, .topbar, .editor { display: none !important; }
+      .app-shell { width: auto; margin: 0; padding: 0; }
+      .workspace { display: block; }
+      .preview-wrap { overflow: visible; padding: 0; }
+      .quote-page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0;
+        padding: 12mm 14mm 10mm;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      .quote-table tr, .notes-signature { break-inside: avoid; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div style="display: flex; justify-content: center; width: 100%; gap: 15px; align-items: center; flex-wrap: wrap;">
+      <a href="index.html">🔍 Buscador</a>
+      <a href="venta.html">🛒 Ventas</a>
+      <a href="admin.html">⚙️ Admin</a>
+      <a href="Generador_Cotizaciones.html" class="active">📄 Cotizaciones</a>
+    </div>
+  </nav>
+
+  <main class="app-shell">
+    <div class="topbar">
+      <div>
+        <h1>Generador de cotizaciones</h1>
+        <p>Llena los formularios o busca productos de tu inventario. La cotización se actualiza automáticamente.</p>
+      </div>
+      <button class="btn btn-primary" id="printTop">🖨️ Imprimir / Guardar PDF</button>
+    </div>
+
+    <section class="workspace">
+      <aside class="editor" aria-label="Formulario de cotización">
+        <section class="panel">
+          <div class="panel-title">
+            <h2>1. Datos de cotización</h2>
+            <span class="badge">General</span>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="quoteNumber">No. de cotización</label>
+              <input id="quoteNumber" type="text" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="quoteDate">Fecha</label>
+              <input id="quoteDate" type="date" />
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>2. Datos del cliente</h2>
+            <span class="badge">Cliente</span>
+          </div>
+          <div class="field-grid">
+            <div class="field full">
+              <label for="clientName">Nombre del cliente</label>
+              <input id="clientName" type="text" placeholder="Ej. María López" autocomplete="name" />
+            </div>
+            <div class="field full">
+              <label for="clientNit">NIT</label>
+              <input id="clientNit" type="text" placeholder="Ej. 1234567-8 o C/F" autocomplete="off" />
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>3. Productos o servicios</h2>
+            <span class="badge" id="productCountBadge">0 productos</span>
+          </div>
+          
+          <!-- Botón para abrir catálogo -->
+          <button class="btn btn-primary btn-wide" type="button" onclick="abrirModalCatalogo()" style="margin-bottom: 15px; font-size: 0.9em;">
+            🔍 Buscar en Inventario
+          </button>
+
+          <div id="productsEditor" class="products-editor"></div>
+          <button class="btn btn-soft btn-wide" id="addProduct" type="button" style="margin-top:10px;">+ Fila Manual en Blanco</button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>4. Notas</h2>
+            <span class="badge">Editable</span>
+          </div>
+          <div class="field">
+            <label for="notes">Una nota por línea</label>
+            <textarea id="notes">Precios sujetos a disponibilidad de inventario.
+Tiempo de validez de esta cotización: 15 días.</textarea>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="actions">
+            <button class="btn btn-primary" id="printBtn" type="button">Generar PDF</button>
+            <button class="btn btn-outline" id="saveBtn" type="button" style="display:none;">Guardar borrador</button>
+            <button class="btn btn-danger" id="newBtn" type="button">Limpiar Todo</button>
+          </div>
+          <div id="savedIndicator" class="saved-indicator">Borrador guardado en este dispositivo.</div>
+        </section>
+      </aside>
+
+      <div class="preview-wrap">
+        <article id="quotePreview" class="quote-page" aria-label="Vista previa de la cotización">
+          <header class="quote-header">
+            <div style="font-size: 24px; font-weight: bold; color: #4a148c;">
+              📦 KAIZEN GT
+            </div>
+            <div class="quote-title-box">
+              <div class="quote-title">Cotización</div>
+              <div class="quote-number"><span>No</span><span id="pvQuoteNumber">2026001</span></div>
+            </div>
+          </header>
+
+          <section class="company-info">
+            RESIDENCIAL VILLAS DEL AMANECER 1 AVENIDA 5-00, Zona 8, VILLA NUEVA, GUATEMALA<br>
+            <strong>NIT: 302013806</strong>
+          </section>
+
+          <section class="client-grid">
+            <div class="box">
+              <div class="box-title">Cotizar a</div>
+              <div class="info-row"><div>Nombre</div><div id="pvClientName">—</div></div>
+              <div class="info-row"><div>NIT</div><div id="pvClientNit">—</div></div>
+            </div>
+            <div class="box date-box">
+              <div class="box-title">Fecha</div>
+              <div class="date-value" id="pvQuoteDate">—</div>
+            </div>
+          </section>
+
+          <section>
+            <table class="quote-table">
+              <thead>
+                <tr>
+                  <th class="col-no">No</th>
+                  <th>Descripción</th>
+                  <th class="col-qty">Cantidad</th>
+                  <th class="col-price">Precio Unitario</th>
+                  <th class="col-sub">Sub Total</th>
+                </tr>
+              </thead>
+              <tbody id="pvProducts"></tbody>
+            </table>
+            <div class="totals">
+              <table class="totals-table">
+                <tr><td>Total</td><td id="pvTotal">Q0.00</td></tr>
+              </table>
+            </div>
+          </section>
+
+          <section class="notes-signature">
+            <div class="notes-box">
+              <div class="notes-title">Notas</div>
+              <ul id="pvNotes" class="notes-list"></ul>
+            </div>
+            <div class="signature-box">
+              <div style="height: 60px;"></div> <!-- Espacio para firma -->
+              <div class="signature-name">Firma Autorizada</div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Catálogo para Cotización -->
+  <div id="modal-catalogo" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2 style="margin: 0; color: var(--morado-oscuro);">Inventario Kaizen</h2>
+        <button onclick="cerrarModalCatalogo()" class="btn-danger" style="width: auto; padding: 8px 15px; margin: 0; border-radius: 20px;">✖ Cerrar</button>
+      </div>
+      <input type="text" id="buscador-modal" placeholder="Buscar por Nombre o Código..." onkeyup="filtrarModal()" style="font-size: 1em; padding: 10px;">
+      <p id="resumen-modal" style="color: #666; font-size: 0.9em; margin-bottom: 0;">Cargando base de datos...</p>
+      
+      <div class="modal-grid" id="grid-modal">
+        <!-- Productos aquí -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // URL DE TU APPS SCRIPT
+    const API_URL = "https://script.google.com/macros/s/AKfycbzfLRPDIGziFyZEzNRjDs54iOb51f_byKxoeaN8JhEEmq5qF6z96oFgLxIYrtpmlNCV/exec";
+    
+    // VARIABLES GLOBALES
+    let inventario = [];
+    let itemsCotizacion = []; // Array de objetos { desc, qty, price }
+
+    // ELEMENTOS DEL DOM
+    const editor = document.getElementById('productsEditor');
+    const btnAdd = document.getElementById('addProduct');
+    const pvProducts = document.getElementById('pvProducts');
+    const pvTotal = document.getElementById('pvTotal');
+    const productCountBadge = document.getElementById('productCountBadge');
+
+    // Inicializar la fecha de hoy
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('quoteDate').valueAsDate = new Date();
+        actualizarVistaPreviaGeneral();
+        cargarInventario();
+    });
+
+    // ==========================================
+    // INVENTARIO API
+    // ==========================================
+    async function cargarInventario() {
+        try {
+            const res = await fetch(API_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ accion: "leer" }),
+                headers: { "Content-Type": "text/plain;charset=utf-8" }
+            });
+            const data = await res.json();
+            inventario = data.datos || [];
+            document.getElementById('resumen-modal').innerText = `Mostrando ${inventario.length} producto(s)`;
+        } catch(e) {
+            document.getElementById('resumen-modal').innerText = "Error al cargar inventario.";
+        }
+    }
+
+    function abrirModalCatalogo() {
+        document.getElementById("modal-catalogo").style.display = "flex";
+        filtrarModal();
+    }
+    function cerrarModalCatalogo() {
+        document.getElementById("modal-catalogo").style.display = "none";
+    }
+
+    function filtrarModal() {
+        const txt = document.getElementById("buscador-modal").value.toLowerCase();
+        const filtrados = inventario.filter(p => String(p.nombre).toLowerCase().includes(txt) || String(p.id).toLowerCase().includes(txt));
+        
+        document.getElementById("grid-modal").innerHTML = filtrados.map(p => {
+            const imgHtml = p.imagen ? `<img src="${p.imagen}">` : `<div style="width: 100%; height: 120px; background: #eee; display:flex; align-items:center; justify-content:center; color:#999; margin-bottom:10px;">Sin Foto</div>`;
+            return `
+            <div class="modal-card" onclick="agregarProductoDesdeCatalogo('${p.nombre.replace(/'/g, "\'")}', ${p.precio})">
+                ${imgHtml}
+                <div style="font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">${p.nombre}</div>
+                <div style="color: #2e7d32; font-weight:bold;">Q${p.precio.toFixed(2)}</div>
+            </div>`;
+        }).join("");
+    }
+
+    // ==========================================
+    // LOGICA COTIZACION EDITOR
+    // ==========================================
+    function agregarProductoDesdeCatalogo(nombre, precio) {
+        itemsCotizacion.push({ desc: nombre, qty: 1, price: precio });
+        renderizarEditor();
+        cerrarModalCatalogo();
+    }
+
+    btnAdd.addEventListener('click', () => {
+        itemsCotizacion.push({ desc: "", qty: 1, price: 0 });
+        renderizarEditor();
+    });
+
+    function eliminarItem(index) {
+        itemsCotizacion.splice(index, 1);
+        renderizarEditor();
+    }
+
+    function actualizarDatosItem(index, campo, valor) {
+        if(campo === 'qty') itemsCotizacion[index].qty = Math.max(1, parseInt(valor) || 0);
+        if(campo === 'price') itemsCotizacion[index].price = parseFloat(valor) || 0;
+        if(campo === 'desc') itemsCotizacion[index].desc = valor;
+        renderizarEditor(false); // false = No recrear inputs para no perder foco, solo actualizar totales visuales
+    }
+
+    function renderizarEditor(recrearDOM = true) {
+        if(recrearDOM) {
+            editor.innerHTML = itemsCotizacion.map((item, i) => `
+                <div class="product-row">
+                    <div class="field">
+                        <label>Descripción</label>
+                        <input type="text" value="${item.desc}" oninput="actualizarDatosItem(${i}, 'desc', this.value)" placeholder="Nombre del producto">
+                    </div>
+                    <div class="field">
+                        <label>Cant.</label>
+                        <input type="number" min="1" value="${item.qty}" oninput="actualizarDatosItem(${i}, 'qty', this.value)">
+                    </div>
+                    <div class="field">
+                        <label>Precio Unit.</label>
+                        <input type="number" step="0.01" value="${item.price}" oninput="actualizarDatosItem(${i}, 'price', this.value)">
+                    </div>
+                    <button type="button" class="icon-btn" onclick="eliminarItem(${i})" title="Eliminar fila">✖</button>
+                    <div class="subtotal-mini">Sub: Q${(item.qty * item.price).toFixed(2)}</div>
+                </div>
+            `).join("");
+        } else {
+            // Actualizar subtotales mini sin reconstruir HTML (para no perder el cursor en el input)
+            const subtotalesMini = document.querySelectorAll('.subtotal-mini');
+            itemsCotizacion.forEach((item, i) => {
+                if(subtotalesMini[i]) subtotalesMini[i].innerText = `Sub: Q${(item.qty * item.price).toFixed(2)}`;
+            });
+        }
+        
+        productCountBadge.innerText = `${itemsCotizacion.length} producto(s)`;
+        actualizarVistaPreviaTabla();
+    }
+
+    // ==========================================
+    // LOGICA VISTA PREVIA
+    // ==========================================
+    const inpNum = document.getElementById('quoteNumber');
+    const inpDate = document.getElementById('quoteDate');
+    const inpName = document.getElementById('clientName');
+    const inpNit = document.getElementById('clientNit');
+    const inpNotes = document.getElementById('notes');
+
+    function actualizarVistaPreviaGeneral() {
+        document.getElementById('pvQuoteNumber').innerText = inpNum.value || "000000";
+        document.getElementById('pvClientName').innerText = inpName.value || "—";
+        document.getElementById('pvClientNit').innerText = inpNit.value || "—";
+        
+        const d = inpDate.value ? new Date(inpDate.value) : new Date();
+        document.getElementById('pvQuoteDate').innerText = d.toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+        const arrNotas = inpNotes.value.split('\n').filter(n => n.trim() !== "");
+        document.getElementById('pvNotes').innerHTML = arrNotas.length > 0 
+            ? arrNotas.map(n => `<li>${n}</li>`).join("") 
+            : "<li>Sin notas adicionales</li>";
+    }
+
+    // Escuchar eventos en los inputs generales
+    [inpNum, inpDate, inpName, inpNit, inpNotes].forEach(el => {
+        el.addEventListener('input', actualizarVistaPreviaGeneral);
+    });
+
+    function actualizarVistaPreviaTabla() {
+        let granTotal = 0;
+        if(itemsCotizacion.length === 0) {
+            pvProducts.innerHTML = `<tr><td colspan="5" class="empty-products">Añade productos para generar la cotización.</td></tr>`;
+            pvTotal.innerText = "Q0.00";
+            return;
+        }
+
+        pvProducts.innerHTML = itemsCotizacion.map((item, i) => {
+            const sub = item.qty * item.price;
+            granTotal += sub;
+            return `
+            <tr>
+                <td class="col-no">${i+1}</td>
+                <td class="desc">${item.desc || "..."}</td>
+                <td class="col-qty">${item.qty}</td>
+                <td class="col-price">Q${item.price.toFixed(2)}</td>
+                <td class="col-sub">Q${sub.toFixed(2)}</td>
+            </tr>`;
+        }).join("");
+
+        pvTotal.innerText = `Q${granTotal.toFixed(2)}`;
+    }
+
+    // ==========================================
+    // BOTONES ACCION
+    // ==========================================
+    document.getElementById('newBtn').addEventListener('click', () => {
+        if(confirm("¿Seguro que deseas borrar toda la cotización actual?")) {
+            inpNum.value = "";
+            inpName.value = "";
+            inpNit.value = "";
+            itemsCotizacion = [];
+            renderizarEditor();
+            actualizarVistaPreviaGeneral();
+        }
+    });
+
+    const fPrint = () => window.print();
+    document.getElementById('printBtn').addEventListener('click', fPrint);
+    document.getElementById('printTop').addEventListener('click', fPrint);
+
+  </script>
+</body>
+</html>

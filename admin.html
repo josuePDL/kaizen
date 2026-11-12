@@ -12,9 +12,10 @@
       <a href="index.html">🔍 Buscador</a>
       <a href="venta.html">🛒 Ventas</a>
       <a href="admin.html" style="background: var(--morado-claro); color: var(--morado-oscuro);">⚙️ Admin</a>
-      <button onclick="abrirModalForm()" style="background: #fff; color: var(--morado-oscuro); padding: 8px 18px; border-radius: 20px; margin: 0; width: auto; font-size: 0.95em;">
+      <button onclick="abrirModalNuevoProducto()" style="background: #fff; color: var(--morado-oscuro); padding: 8px 18px; border-radius: 20px; margin: 0; width: auto; font-size: 0.95em;">
         ➕ Agregar Producto
       </button>
+      <a href="Generador_Cotizaciones.html">📄 Cotizaciones</a>
     </div>
   </nav>
 
@@ -22,32 +23,38 @@
     <!-- Panel de Edición -->
     <div class="col-3 panel">
       <h2 id="titulo-form">Editar Producto</h2>
-      <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Selecciona un producto de la tabla para modificar sus datos.</p>
+      <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Selecciona un producto para editar.</p>
       
       <form id="form-editar" onsubmit="guardarEdicion(event)">
         <input type="hidden" id="prod-fila" value="">
+        <input type="hidden" id="prod-imagen-actual" value=""> <!-- Para guardar la url si no suben foto nueva -->
 
-        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Código / ID de Barras:</label>
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Código / ID:</label>
         <input type="text" id="prod-codigo" required>
 
         <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Nombre del producto:</label>
         <input type="text" id="prod-nombre" required>
 
         <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Descripción:</label>
-        <textarea id="prod-desc" rows="3"></textarea>
+        <textarea id="prod-desc" rows="2"></textarea>
+        
+        <!-- SELECCIONAR FOTO (FILE) -->
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Actualizar Foto (Opcional):</label>
+        <input type="file" id="prod-file" accept="image/*">
+        <p style="font-size: 0.75em; color: #888; margin-top: -10px; margin-bottom: 15px;">Solo sube una imagen si quieres cambiar la actual.</p>
 
         <div style="display: flex; gap: 10px;">
             <div style="flex: 1;">
-                <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Precio Costo:</label>
+                <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Costo:</label>
                 <input type="number" id="prod-costo" step="0.01" required>
             </div>
             <div style="flex: 1;">
-                <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Precio Venta:</label>
+                <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Venta:</label>
                 <input type="number" id="prod-precio" step="0.01" required>
             </div>
         </div>
 
-        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Cantidad / Stock:</label>
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Stock:</label>
         <input type="number" id="prod-cantidad" required>
 
         <button type="submit" id="btn-submit" disabled>Selecciona un producto</button>
@@ -61,26 +68,26 @@
       <!-- DASHBOARD DE TOTALES -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px;">
         <div style="background: #f3e5f5; padding: 15px; border-radius: 12px; border-left: 5px solid var(--morado-oscuro);">
-          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">CANTIDAD PRODUCTOS</p>
+          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">PRODUCTOS</p>
           <h3 id="metric-productos" style="margin: 5px 0 0 0; font-size: 1.4em; color: var(--morado-oscuro);">0</h3>
         </div>
         <div style="background: #e8f5e9; padding: 15px; border-radius: 12px; border-left: 5px solid #2e7d32;">
-          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">TOTAL COSTO (INVERSIÓN)</p>
+          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">INVERSIÓN</p>
           <h3 id="metric-costo" style="margin: 5px 0 0 0; font-size: 1.4em; color: #2e7d32;">Q0.00</h3>
         </div>
         <div style="background: #e3f2fd; padding: 15px; border-radius: 12px; border-left: 5px solid #1565c0;">
-          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">TOTAL VENTA (PROYECCIÓN)</p>
+          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">VENTA BRUTA</p>
           <h3 id="metric-venta" style="margin: 5px 0 0 0; font-size: 1.4em; color: #1565c0;">Q0.00</h3>
         </div>
         <div style="background: #fff3e0; padding: 15px; border-radius: 12px; border-left: 5px solid #e65100;">
-          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">GANANCIA ESPERADA</p>
+          <p style="margin: 0; font-size: 0.8em; color: #666; font-weight: bold;">GANANCIA</p>
           <h3 id="metric-ganancia" style="margin: 5px 0 0 0; font-size: 1.4em; color: #e65100;">Q0.00</h3>
         </div>
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
         <h2 style="margin-bottom: 5px;">Inventario General</h2>
-        <button onclick="cargarDatos()" style="width: auto; padding: 8px 15px; font-size: 0.9em; border-radius: 20px;">🔄 Refrescar Tabla</button>
+        <button onclick="cargarDatos()" style="width: auto; padding: 8px 15px; font-size: 0.9em; border-radius: 20px;">🔄 Refrescar</button>
       </div>
       
       <div class="table-container">
@@ -102,15 +109,47 @@
     </div>
   </div>
 
-  <div id="modal-form" class="modal-overlay">
-    <div class="modal-content" style="max-width: 800px; width: 95%; height: 90vh; display: flex; flex-direction: column; padding: 15px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h2 style="margin: 0; color: var(--morado-oscuro);">Registrar Nuevo Producto</h2>
-        <button onclick="cerrarModalForm()" class="btn-danger" style="width: auto; padding: 8px 15px; margin: 0; border-radius: 20px;">✖ Cerrar y Refrescar</button>
-      </div>
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScq9EBMKzV99g7B2eDVYEfvPc03oC8MDE_rRSVB_O0UlRbAMQ/viewform?embedded=true" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0" style="flex-grow: 1; border-radius: 8px; border: 1px solid #eee; background: white;"></iframe>
+  <!-- MODAL CREAR CON UPLOAD -->
+  <div id="modal-nuevo-producto" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px; width: 95%; max-height: 90vh; overflow-y: auto; text-align: left;">
+      <h2 style="color: var(--morado-oscuro); margin-bottom: 20px; text-align: center;">Registrar Nuevo Producto</h2>
+      
+      <form id="form-nuevo" onsubmit="guardarNuevoProducto(event)">
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Código / ID de Barras:</label>
+        <input type="text" id="nuevo-codigo" required>
+
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Nombre del producto:</label>
+        <input type="text" id="nuevo-nombre" required>
+
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Descripción:</label>
+        <textarea id="nuevo-desc" rows="2"></textarea>
+
+        <!-- SELECCIONAR FOTO (FILE) -->
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Subir Foto de tu Dispositivo:</label>
+        <input type="file" id="nuevo-file" accept="image/*">
+
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Precio Costo:</label>
+                <input type="number" id="nuevo-costo" step="0.01" required>
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Precio Venta:</label>
+                <input type="number" id="nuevo-precio" step="0.01" required>
+            </div>
+        </div>
+
+        <label style="font-size: 0.85em; color: var(--morado-oscuro); font-weight: bold;">Cantidad Inicial:</label>
+        <input type="number" id="nuevo-cantidad" required>
+
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button type="submit" id="btn-submit-nuevo" style="flex: 1;">💾 Guardar Producto</button>
+            <button type="button" onclick="cerrarModalNuevoProducto()" class="btn-danger" style="flex: 1;">❌ Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
+
   <script src="admin.js"></script>
 </body>
 </html>

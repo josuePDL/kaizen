@@ -1,3 +1,4 @@
+
 :root {
   --morado-oscuro: #4a148c;
   --morado-medio: #7b1fa2;
@@ -15,6 +16,7 @@ nav a:hover, nav a:active { background-color: var(--morado-claro); color: var(--
 .panel { background: var(--blanco); padding: 25px; border-radius: var(--border-radius); box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 25px; border-top: 5px solid var(--morado-medio); }
 h1, h2, h3 { color: var(--morado-oscuro); margin-top: 0; }
 input, textarea, button { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; transition: all 0.3s ease; }
+input[type="file"] { padding: 9px; background: #f9f9f9; }
 input:focus, textarea:focus { outline: none; border-color: var(--morado-medio); box-shadow: 0 0 0 3px rgba(123, 31, 162, 0.15); }
 button { background-color: var(--morado-medio); color: var(--blanco); border: none; cursor: pointer; font-weight: bold; border-radius: 8px; transition: all 0.3s ease; }
 button:hover { background-color: var(--morado-oscuro); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
